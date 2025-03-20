@@ -83,9 +83,7 @@ async def start_handler(message: types.Message):
         await message.answer("Привіт! Ви підписалися на бота.", reply_markup=main_keyboard())
 
         # Сповіщення адміну
-        admin_message = f"🔔 *Нова підписка!*
-👤 ID: `{user_id}`
-💬 Юзернейм: @{username}"
+        admin_message = f"🔔 *Нова підписка!*\n👤 ID: `{user_id}`\n💬 Юзернейм: @{username}"
         await bot.send_message(ADMIN_ID, admin_message, parse_mode="Markdown")
     else:
         await message.answer("Ви вже підписані.", reply_markup=main_keyboard())
