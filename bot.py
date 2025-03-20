@@ -20,8 +20,8 @@ dp = Dispatcher()
 subscribers = set()
 massage_bookings = {}  # Зберігає записи користувачів
 
-# URL зображення прайсу (замініть на реальний URL)
-PRICE_IMAGE_URL = "https://drive.google.com/file/d/1tELToj0vtDrSb3-sh_nXTvqXlV4r7ayn/view?usp=sharing"  
+# URL зображення прайсу 
+PRICE_IMAGE_URL = "https://www.dropbox.com/scl/fi/z25kakyigrnuoz5idl1hv/photo_2025-03-20_16-16-36.jpg?rlkey=tszprs745na564o1m9ku5jz26&st=td8us3zu&dl=0"  
 
 async def set_bot_commands():
     commands = [
