@@ -28,67 +28,83 @@ async def set_bot_commands():
     await bot.set_my_commands(commands)
 
 # Головне меню
+
 def main_keyboard():
     return ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="Записатися на масаж")],
             [KeyboardButton(text="Перевірити статус")],
             [KeyboardButton(text="Прайс")],
+            [KeyboardButton(text="Опис масажів")],
             [KeyboardButton(text="Поділитися номером", request_contact=True)]
         ],
         resize_keyboard=True
     )
+
+# Клавіатура для опису масажів
+
+def massage_description_keyboard():
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="Класичний масаж")],
+            [KeyboardButton(text="Лімфодренажний масаж")],
+            [KeyboardButton(text="Антицелюлітний масаж")],
+            [KeyboardButton(text="Лікувальний масаж")],
+            [KeyboardButton(text="Міофасціальний масаж")],
+            [KeyboardButton(text="Вакуумний масаж")],
+            [KeyboardButton(text="Креольський масаж")],
+            [KeyboardButton(text="⬅ Назад")]
+        ],
+        resize_keyboard=True
+    )
+
+# Опис масажів
+MASSAGE_DESCRIPTIONS = {
+    "Класичний масаж": "🔹 Класичний масаж покращує кровообіг, знімає напругу м’язів та сприяє загальному розслабленню.",
+    "Лімфодренажний масаж": "🔹 Лімфодренажний масаж допомагає вивести зайву рідину, зменшити набряки та покращити обмін речовин.",
+    "Антицелюлітний масаж": "🔹 Антицелюлітний масаж спрямований на зменшення целюліту та покращення стану шкіри.",
+    "Лікувальний масаж": "🔹 Лікувальний масаж допомагає зменшити біль у м’язах, поліпшити рухливість суглобів та відновити після травм.",
+    "Міофасціальний масаж": "🔹 Міофасціальний масаж працює з глибокими тканинами, розслаблюючи м’язові затиски та покращуючи еластичність.",
+    "Вакуумний масаж": "🔹 Вакуумний масаж стимулює кровообіг, допомагає позбутися застійних явищ та покращує стан шкіри.",
+    "Креольський масаж": "🔹 Креольський масаж виконується за допомогою спеціальних бамбукових паличок для глибокого впливу на тканини."
+}
+
+# Посилання на зображення прайсу
+PRICE_IMAGE_URL = "https://www.dropbox.com/scl/fi/z25kakyigrnuoz5idl1hv/photo_2025-03-20_16-16-36.jpg?rlkey=tszprs745na564o1m9ku5jz26&st=td8us3zu&dl=0"
 
 # Обробник команди /start
 @dp.message(Command("start"))
 async def start_handler(message: types.Message):
     user_id = message.chat.id
     username = message.from_user.username or "Немає юзернейму"
-
+    
     if user_id not in subscribers:
         subscribers[user_id] = {"username": username, "phone": None}
         await message.answer("Привіт! Ви підписалися на бота.", reply_markup=main_keyboard())
 
         # Сповіщення адміну
-        admin_message = f"🔔 *Нова підписка!*\n👤 ID: `{user_id}`\n💬 Юзернейм: @{username}"
+        admin_message = f"🔔 *Нова підписка!*
+👤 ID: `{user_id}`
+💬 Юзернейм: @{username}"
         await bot.send_message(ADMIN_ID, admin_message, parse_mode="Markdown")
     else:
         await message.answer("Ви вже підписані.", reply_markup=main_keyboard())
 
-# Обробник отримання номера телефону
-@dp.message(lambda message: message.contact)
-async def handle_contact(message: types.Message):
-    user_id = message.chat.id
-    phone_number = message.contact.phone_number
+# Обробник кнопки "Опис масажів"
+@dp.message(lambda message: message.text.lower() == "опис масажів")
+async def show_massage_options(message: types.Message):
+    await message.answer("Оберіть тип масажу для детального опису:", reply_markup=massage_description_keyboard())
 
-    if user_id in subscribers:
-        subscribers[user_id]["phone"] = phone_number
+# Обробка вибору масажу
+@dp.message(lambda message: message.text in MASSAGE_DESCRIPTIONS)
+async def show_massage_description(message: types.Message):
+    description = MASSAGE_DESCRIPTIONS[message.text]
+    await message.answer(description)
 
-    # Сповіщення адміну
-    admin_message = f"📱 *Отримано контакт від користувача*\n👤 ID: `{user_id}`\n📞 Телефон: {phone_number}"
-    await bot.send_message(ADMIN_ID, admin_message, parse_mode="Markdown")
-
-    await message.answer("Дякуємо! Ваш номер збережено.")
-
-# Обробник кнопки "Записатися на масаж"
-@dp.message(lambda message: message.text.lower() == "записатися на масаж")
-async def book_massage(message: types.Message):
-    user_id = message.chat.id
-    username = message.from_user.username or "Немає юзернейму"
-    
-    massage_bookings[user_id] = "Очікує підтвердження"
-
-    await message.answer("Ви записалися на масаж. З вами зв'яжеться масажист.")
-
-    # Сповіщення адміну
-    admin_message = f"✍ *Новий запис на масаж!*\n👤 ID: `{user_id}`\n💬 Юзернейм: @{username}"
-    await bot.send_message(ADMIN_ID, admin_message, parse_mode="Markdown")
-
-# Обробник кнопки "Перевірити статус"
-@dp.message(lambda message: message.text.lower() == "перевірити статус")
-async def check_status(message: types.Message):
-    status = massage_bookings.get(message.chat.id, "У вас немає запису на масаж.")
-    await message.answer(f"📌 *Ваш статус:* {status}")
+# Обробка кнопки "Назад"
+@dp.message(lambda message: message.text == "⬅ Назад")
+async def back_to_main_menu(message: types.Message):
+    await message.answer("🔙 Повернення до головного меню", reply_markup=main_keyboard())
 
 # Обробник кнопки "Прайс"
 @dp.message(lambda message: message.text.lower() == "прайс")
@@ -100,7 +116,7 @@ async def show_price(message: types.Message):
     except Exception as e:
         await message.answer("⚠ Виникла помилка при відправці прайсу.")
         print(f"Помилка: {e}")
-
+        
 # Обробник команди /subscribers (тільки для адміністратора)
 @dp.message(Command("subscribers"))
 async def list_subscribers(message: types.Message):
