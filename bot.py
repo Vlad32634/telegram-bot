@@ -36,7 +36,6 @@ def main_keyboard():
             [KeyboardButton(text="Перевірити статус")],
             [KeyboardButton(text="Прайс")],
             [KeyboardButton(text="Опис масажів")],
-            [KeyboardButton(text="Поділитися номером", request_contact=True)]
         ],
         resize_keyboard=True
     )
