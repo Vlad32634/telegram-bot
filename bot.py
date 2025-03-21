@@ -88,8 +88,42 @@ async def start_handler(message: types.Message):
     else:
         await message.answer("Ви вже підписані.", reply_markup=main_keyboard())
 
+# Обробник кнопки "Записатися на масаж"
+@dp.message(lambda message: message.text and message.text.lower() == "записатися на масаж")
+async def book_massage(message: types.Message):
+    user_id = message.chat.id
+    username = message.from_user.username or "Немає юзернейму"
+    
+    massage_bookings[user_id] = {
+        "status": "Очікує підтвердження",
+        "username": username,
+        "phone": subscribers.get(user_id, {}).get("phone", "Немає номера")
+    }
+
+    await message.answer("✅ Ви записалися на масаж. З вами зв'яжеться масажист.")
+
+    # Сповіщення адміну
+    admin_message = (
+        f"✍ *Новий запис на масаж!*\n"
+        f"👤 ID: `{user_id}`\n"
+        f"💬 Юзернейм: @{username}\n"
+        f"📞 Телефон: {massage_bookings[user_id]['phone']}"
+    )
+    await bot.send_message(ADMIN_ID, admin_message, parse_mode="Markdown")
+
+# Обробник кнопки "Перевірити статус"
+@dp.message(lambda message: message.text and message.text.lower() == "перевірити статус")
+async def check_status(message: types.Message):
+    user_id = message.chat.id
+    booking = massage_bookings.get(user_id)
+
+    if booking:
+        await message.answer(f"📌 *Ваш статус:* {booking['status']}", parse_mode="Markdown")
+    else:
+        await message.answer("ℹ У вас немає запису на масаж. Ви можете записатися через меню.")
+
 # Обробник кнопки "Опис масажів"
-@dp.message(lambda message: message.text.lower() == "опис масажів")
+@dp.message(lambda message: message.text and message.text.lower() == "опис масажів")
 async def show_massage_options(message: types.Message):
     await message.answer("Оберіть тип масажу для детального опису:", reply_markup=massage_description_keyboard())
 
