@@ -39,31 +39,6 @@ def main_keyboard():
         resize_keyboard=True
     )
 
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-
-# Клавіатура для опису масажів
-def get_massage_keyboard():
-    # Створюємо клавіатуру з параметром resize_keyboard
-    keyboard = ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="Класичний масаж")],
-            [KeyboardButton(text="Лімфодренажний масаж")],
-            [KeyboardButton(text="Антицелюлітний масаж")],
-            [KeyboardButton(text="Лікувальний масаж")],
-            [KeyboardButton(text="Міофасціальний масаж")],
-            [KeyboardButton(text="Вакуумний масаж")],
-            [KeyboardButton(text="Креольський масаж")],
-            [KeyboardButton(text="⬅ Назад")]
-        ],
-        resize_keyboard=True
-    )
-
-    # Додаємо кнопки для кожного типу масажу з MASSAGE_DESCRIPTIONS
-    for name in MASSAGE_DESCRIPTIONS.keys():
-        keyboard.add(KeyboardButton(text=name))
-
-    return keyboard
-    
 MASSAGE_DESCRIPTIONS = {
     "Класичний масаж": {
         "text": "🔹 Класичний масаж покращує кровообіг, знімає напругу м’язів та сприяє загальному розслабленню.",
@@ -92,11 +67,18 @@ MASSAGE_DESCRIPTIONS = {
     "Креольський масаж": {
         "text": "🔹 Креольський масаж виконується за допомогою спеціальних бамбукових паличок для глибокого впливу на тканини.",
         "photo": "https://www.dropbox.com/scl/fi/ped1ssk7o1awe2i3n9pvv/photo_2025-03-22_14-09-50.jpg?rlkey=ifotepuj04tex8w9vr9kc707b&st=lk0l5oq9&dl=0"
-  }
+    }
 }
 
 # Посилання на зображення прайсу
 PRICE_IMAGE_URL = "https://www.dropbox.com/scl/fi/z25kakyigrnuoz5idl1hv/photo_2025-03-20_16-16-36.jpg?rlkey=tszprs745na564o1m9ku5jz26&st=td8us3zu&dl=0"
+
+# Функція для створення клавіатури з масажами
+def get_massage_keyboard():
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+    for name in MASSAGE_DESCRIPTIONS.keys():
+        keyboard.add(KeyboardButton(text=name))
+    return keyboard
 
 # Обробник команди /start
 @dp.message(Command("start"))
@@ -148,13 +130,6 @@ async def check_status(message: types.Message):
     else:
         await message.answer("ℹ У вас немає запису на масаж. Ви можете записатися через меню.")
 
-# Функція для створення клавіатури з масажами
-def get_massage_keyboard():
-    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-    for name in MASSAGE_DESCRIPTIONS.keys():
-        keyboard.add(KeyboardButton(text=name))
-    return keyboard
-
 @dp.message(lambda message: message.text == "Опис масажів")
 async def show_massage_list(message: types.Message):
     keyboard = get_massage_keyboard()
@@ -204,10 +179,10 @@ async def list_subscribers(message: types.Message):
     
     await message.answer(response, parse_mode="Markdown")
 
-# Основна асинхронна функція
+# Основний цикл бота
 async def main():
     await set_bot_commands()
-    await dp.start_polling(bot)
+    await dp.start_polling()
 
 if __name__ == "__main__":
     asyncio.run(main())
