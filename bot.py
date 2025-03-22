@@ -1,4 +1,4 @@
-import os
+mport os
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import BotCommand
 import asyncio
@@ -11,7 +11,7 @@ if not TOKEN:
 
 # Ініціалізація об'єкта бота
 bot = Bot(token=TOKEN)
-dp = Dispatcher(bot)  # Використовуємо Dispatcher з параметром bot
+dp = Dispatcher(bot)  # Dispatcher без явного передавання параметра через конструктор
 
 async def set_bot_commands():
     commands = [
