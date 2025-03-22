@@ -89,9 +89,10 @@ async def check_status(message: types.Message):
 # Обробник кнопки "Опис масажів"
 @dp.message(lambda message: message.text.lower() == "опис масажів")
 async def show_massage_list(message: types.Message):
-    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-    for name in MASSAGE_DESCRIPTIONS.keys():
-        keyboard.add(KeyboardButton(text=name))
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text=name)] for name in MASSAGE_DESCRIPTIONS.keys()],
+        resize_keyboard=True
+    )
     await message.answer("Оберіть вид масажу:", reply_markup=keyboard)
 
 # Обробник вибору конкретного масажу
