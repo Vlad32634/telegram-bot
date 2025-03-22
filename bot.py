@@ -31,10 +31,7 @@ async def send_welcome(message: types.Message):
 async def main():
     await set_bot_commands()  # Налаштовуємо команди
     await dp.start_polling(bot)   # Запуск polling
-
-if __name__ == "__main__":
-    asyncio.run(main())
-        
+    
 # Головне меню
 def main_keyboard():
     return ReplyKeyboardMarkup(
