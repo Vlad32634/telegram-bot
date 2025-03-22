@@ -1,24 +1,19 @@
 from aiogram import Bot, Dispatcher, types
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, BotCommand
+from aiogram.types import BotCommand
 from aiogram.filters import Command
 import os
 import asyncio
 
-# Отримуємо токен з змінної середовища та видаляємо зайві пробіли
+# Отримуємо токен з змінної середовища
 TOKEN = os.getenv("BOT_TOKEN", "").strip()
-ADMIN_ID = os.getenv("ADMIN_ID", "").strip()
 
+# Перевірка, чи правильний токен
 if not TOKEN:
     raise ValueError("Токен бота не знайдено або він порожній! Перевірте налаштування змінної середовища.")
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-# Список підписників та записів
-subscribers = {}
-massage_bookings = {}
-
-# Команди бота
 async def set_bot_commands():
     commands = [
         BotCommand(command="start", description="Запустити бота"),
@@ -26,6 +21,14 @@ async def set_bot_commands():
         BotCommand(command="subscribers", description="Список підписників (адмін)")
     ]
     await bot.set_my_commands(commands)
+
+async def main():
+    await set_bot_commands()
+    try:
+        await dp.start_polling(bot)  # Передаємо bot в start_polling
+    except Exception as e:
+        print(f"Помилка при запуску polling: {e}")
+        await bot.close()
 
 # Головне меню
 def main_keyboard():
