@@ -145,11 +145,20 @@ async def check_status(message: types.Message):
 def get_massage_keyboard():
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
     for name in MASSAGE_DESCRIPTIONS.keys():
-        keyboard.add(KeyboardButton(text=name))  # Додаємо кнопку з назвою масажу
+        keyboard.add(KeyboardButton(text=name))
     return keyboard
 
-# Виклик клавіатури за командою "Опис масажів"
-@dp.message(lambda message: message.text.lower() == "опис масажів")
+# Функція для створення головного меню
+def main_keyboard():
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="Опис масажів")]
+        ],
+        resize_keyboard=True
+    )
+
+# Обробник кнопки "Опис масажів"
+@dp.message(lambda message: message.text and message.text.lower() == "опис масажів")
 async def show_massage_list(message: types.Message):
     keyboard = get_massage_keyboard()
     await message.answer("Оберіть вид масажу:", reply_markup=keyboard)
@@ -166,6 +175,7 @@ async def massage_description_handler(message: types.Message):
         await message.answer_photo(photo, caption=description)
     else:
         await message.answer("Будь ласка, виберіть масаж із кнопок.")
+
 
 # Обробка кнопки "Назад"
 @dp.message(lambda message: message.text == "⬅ Назад")
