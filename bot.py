@@ -1,6 +1,5 @@
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import BotCommand, Message
-from aiogram.utils import executor
 import os
 import asyncio
 
