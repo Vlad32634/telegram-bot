@@ -53,10 +53,10 @@ def get_massage_keyboard():
             [KeyboardButton(text="Вакуумний масаж")],
             [KeyboardButton(text="Креольський масаж")],
             [KeyboardButton(text="⬅ Назад")]
-        ],
-        resize_keyboard=True
-    )
-    return keyboard
+        [KeyboardButton(text=name)] for name in MASSAGE_DESCRIPTIONS.keys()
+    ],
+    resize_keyboard=True
+)
 
 MASSAGE_DESCRIPTIONS = {
     "Класичний масаж": {
