@@ -40,20 +40,32 @@ def main_keyboard():
     )
 
 # Клавіатура для опису масажів
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-
-def get_massage_keyboard():
+fdef get_massage_keyboard():
     keyboard = ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="Класичний масаж")],
-            [KeyboardButton(text="Лімфодренажний масаж")],
-            [KeyboardButton(text="Антицелюлітний масаж")],
-            [KeyboardButton(text="Лікувальний масаж")],
-            [KeyboardButton(text="Міофасціальний масаж")],
-            [KeyboardButton(text="Вакуумний масаж")],
-            [KeyboardButton(text="Креольський масаж")],
-            [KeyboardButton(text="⬅ Назад")]
-        ] + [[KeyboardButton(text=name)] for name in MASSAGE_DESCRIPTIONS.keys()],
+        resize_keyboard=True
+    )
+
+    # Додаємо стандартні кнопки
+    keyboard.add(
+        KeyboardButton(text="Класичний масаж"),
+        KeyboardButton(text="Лімфодренажний масаж"),
+        KeyboardButton(text="Антицелюлітний масаж"),
+        KeyboardButton(text="Лікувальний масаж"),
+        KeyboardButton(text="Міофасціальний масаж"),
+        KeyboardButton(text="Вакуумний масаж"),
+        KeyboardButton(text="Креольський масаж"),
+        KeyboardButton(text="⬅ Назад")
+    )
+
+MASSAGE_DESCRIPTIONS = {
+    "Класичний масаж": "Опис класичного масажу...",
+    "Лімфодренажний масаж": "Опис лімфодренажного масажу...",
+    "Антицелюлітний масаж": "Опис антицелюлітного масажу...",
+    "Лікувальний масаж": "Опис лікувального масажу...",
+    "Міофасціальний масаж": "Опис міофасціального масажу...",
+    "Вакуумний масаж": "Опис вакуумного масажу...",
+    "Креольський масаж": "Опис креольського масажу..."
+}
         resize_keyboard=True
     )
     return keyboard
