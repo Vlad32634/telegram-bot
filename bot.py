@@ -141,20 +141,31 @@ async def check_status(message: types.Message):
     else:
         await message.answer("ℹ У вас немає запису на масаж. Ви можете записатися через меню.")
 
-# Обробник кнопок з описом масажів
+# Функція для створення клавіатури з масажами
+def get_massage_keyboard():
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+    for name in MASSAGE_DESCRIPTIONS.keys():
+        keyboard.add(KeyboardButton(text=name))  # Додаємо кнопку з назвою масажу
+    return keyboard
+
+# Виклик клавіатури за командою "Опис масажів"
 @dp.message(lambda message: message.text.lower() == "опис масажів")
 async def show_massage_list(message: types.Message):
-    keyboard = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text=name)] for name in MASSAGE_DESCRIPTIONS.keys()],
-        resize_keyboard=True
-    )
+    keyboard = get_massage_keyboard()
     await message.answer("Оберіть вид масажу:", reply_markup=keyboard)
-        
-# Обробка вибору масажу
+
+# Обробник кнопок з описом масажів
 @dp.message(lambda message: message.text in MASSAGE_DESCRIPTIONS)
-async def show_massage_description(message: types.Message):
-    description = MASSAGE_DESCRIPTIONS[message.text]
-    await message.answer(description)
+async def massage_description_handler(message: types.Message):
+    massage_type = message.text.strip()
+    
+    if massage_type in MASSAGE_DESCRIPTIONS:
+        description = MASSAGE_DESCRIPTIONS[massage_type]["text"]
+        photo = MASSAGE_DESCRIPTIONS[massage_type]["photo"]
+
+        await message.answer_photo(photo, caption=description)
+    else:
+        await message.answer("Будь ласка, виберіть масаж із кнопок.")
 
 # Обробка кнопки "Назад"
 @dp.message(lambda message: message.text == "⬅ Назад")
