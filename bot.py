@@ -11,7 +11,7 @@ if not TOKEN:
 
 # Ініціалізація бота та диспетчера
 bot = Bot(token=TOKEN)
-dp = Dispatcher(bot)
+dp = Dispatcher()
 
 # Функція для налаштування команд бота
 async def set_bot_commands():
@@ -30,7 +30,10 @@ async def send_welcome(message: types.Message):
 # Основна функція
 async def main():
     await set_bot_commands()  # Налаштовуємо команди
-    await dp.start_polling()   # Запуск polling
+    await dp.start_polling(bot)   # Запуск polling
+
+if __name__ == "__main__":
+    asyncio.run(main())
         
 # Головне меню
 def main_keyboard():
