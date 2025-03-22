@@ -26,15 +26,16 @@ async def set_bot_commands():
 # Головне меню
 def main_keyboard():
     keyboard = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton(text="Записатися на масаж")],
-        [KeyboardButton(text="Перевірити статус")],
-        [KeyboardButton(text="Прайс")],
-        [KeyboardButton(text="Опис масажів")]
-    ],
-    resize_keyboard=True
-)
-
+        keyboard=[
+            [KeyboardButton(text="Записатися на масаж")],
+            [KeyboardButton(text="Перевірити статус")],
+            [KeyboardButton(text="Прайс")],
+            [KeyboardButton(text="Опис масажів")]
+        ],
+        resize_keyboard=True
+    )  
+    return keyboard  
+    
 # Опис масажів
 MASSAGE_DESCRIPTIONS = {
     "Класичний масаж": {
