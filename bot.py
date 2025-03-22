@@ -40,9 +40,10 @@ def main_keyboard():
     )
 
 # Клавіатура для опису масажів
+# Клавіатура для опису масажів
 def get_massage_keyboard():
     keyboard = ReplyKeyboardMarkup(
-        resize_keyboard=True
+        resize_keyboard=True  # це має бути в середині конструктора
     )
 
     # Додаємо стандартні кнопки
@@ -57,19 +58,11 @@ def get_massage_keyboard():
         KeyboardButton(text="⬅ Назад")
     )
 
-MASSAGE_DESCRIPTIONS = {
-    "Класичний масаж": "Опис класичного масажу...",
-    "Лімфодренажний масаж": "Опис лімфодренажного масажу...",
-    "Антицелюлітний масаж": "Опис антицелюлітного масажу...",
-    "Лікувальний масаж": "Опис лікувального масажу...",
-    "Міофасціальний масаж": "Опис міофасціального масажу...",
-    "Вакуумний масаж": "Опис вакуумного масажу...",
-    "Креольський масаж": "Опис креольського масажу..."
-}
-        resize_keyboard=True
-    )
-    
-return keyboard
+    # Додаємо кнопки для кожного типу масажу з MASSAGE_DESCRIPTIONS
+    for name in MASSAGE_DESCRIPTIONS.keys():
+        keyboard.add(KeyboardButton(text=name))
+
+    return keyboard
 
 MASSAGE_DESCRIPTIONS = {
     "Класичний масаж": {
