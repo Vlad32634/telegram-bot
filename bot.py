@@ -11,7 +11,12 @@ if not TOKEN:
 
 # Ініціалізація об'єкта бота
 bot = Bot(token=TOKEN)
-dp = Dispatcher(bot)  # Dispatcher без явного передавання параметра через конструктор
+
+# Ініціалізація диспетчера без передавання bot в конструктор
+dp = Dispatcher()
+
+# Додаємо bot через метод
+dp.bot = bot
 
 async def set_bot_commands():
     commands = [
