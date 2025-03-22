@@ -1,5 +1,5 @@
 from aiogram import Bot, Dispatcher, types
-from aiogram.types import BotCommand, Message
+from aiogram.types import BotCommand
 import os
 import asyncio
 
@@ -11,7 +11,7 @@ if not TOKEN:
 
 # Ініціалізація бота та диспетчера
 bot = Bot(token=TOKEN)
-dp = Dispatcher(bot=bot)  # Параметр bot передається явно
+dp = Dispatcher(bot)
 
 # Функція для налаштування команд бота
 async def set_bot_commands():
@@ -24,7 +24,7 @@ async def set_bot_commands():
 
 # Обробник команди "/start"
 @dp.message_handler(commands=["start"])
-async def send_welcome(message: Message):
+async def send_welcome(message: types.Message):
     await message.answer("Привіт! Я бот для масажу.")
 
 # Основна функція
