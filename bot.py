@@ -1,4 +1,4 @@
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher, Router, types
 from aiogram.types import BotCommand, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.filters import Command
 import asyncio
@@ -11,7 +11,8 @@ if not TOKEN:
 
 # Ініціалізація бота та диспетчера
 bot = Bot(token=TOKEN)
-dp = Dispatcher()  # В aiogram v3 Dispatcher не приймає бот як аргумент
+dp = Dispatcher()  # Dispatcher створюється без аргументів
+router = Router()  # Окремий Router для хендлерів
 
 # Функція для налаштування команд
 async def set_bot_commands():
@@ -69,8 +70,8 @@ MASSAGE_DESCRIPTIONS = {
 # Посилання на зображення прайсу
 PRICE_IMAGE_URL = "https://www.dropbox.com/scl/fi/z25kakyigrnuoz5idl1hv/photo_2025-03-20_16-16-36.jpg?rlkey=tszprs745na564o1m9ku5jz26&st=td8us3zu&dl=0"
 
-# Обробник команди /start
-@dp.message(Command("start"))
+# Обробник команди /start (реєструємо його у router, а не в dp)
+@router.message(Command("start"))
 async def start_handler(message: types.Message):
     await message.answer("Привіт! Я бот для запису на масаж.", reply_markup=main_keyboard())
     
@@ -113,9 +114,9 @@ async def show_price(message: types.Message):
         await message.answer("⚠ Виникла помилка при відправці прайсу.")
         print(f"Помилка: {e}")
 
-# Реєстрація хендлерів
+# Головна асинхронна функція
 async def main():
-    dp.include_router(dp)  # В aiogram v3 треба вручну додавати роутери
+    dp.include_router(router)  # Додаємо router в Dispatcher
     await set_bot_commands()
     await dp.start_polling(bot)
 
