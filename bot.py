@@ -147,11 +147,11 @@ def get_massage_keyboard():
     return keyboard
 
 # Обробник кнопки "Опис масажів"
-@dp.message(lambda message: message.text == "Опис масажів")
+@dp.message_handler(lambda message: message.text in ["Опис масажів"])
 async def show_massage_list(message: types.Message):
     keyboard = get_massage_keyboard()
     await message.answer("Оберіть вид масажу:", reply_markup=keyboard)
-
+    
 # Обробник кнопок з описом масажів
 @dp.message(lambda message: message.text in MASSAGE_DESCRIPTIONS)
 async def massage_description_handler(message: types.Message):
