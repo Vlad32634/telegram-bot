@@ -1,5 +1,5 @@
 from aiogram import Bot, Dispatcher, Router, types
-from aiogram.types import BotCommand, import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import BotCommand, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.filters import Command
 import asyncio
 import os
