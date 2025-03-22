@@ -148,15 +148,6 @@ def get_massage_keyboard():
         keyboard.add(KeyboardButton(text=name))
     return keyboard
 
-# Функція для створення головного меню
-def main_keyboard():
-    return ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="Опис масажів")]
-        ],
-        resize_keyboard=True
-    )
-
 # Обробник кнопки "Опис масажів"
 @dp.message(lambda message: message.text and message.text.lower() == "опис масажів")
 async def show_massage_list(message: types.Message):
