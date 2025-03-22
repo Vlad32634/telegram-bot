@@ -1,18 +1,17 @@
+import os
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import BotCommand
-from aiogram.filters import Command
-import os
 import asyncio
 
-# Отримуємо токен з змінної середовища
-TOKEN = os.getenv("BOT_TOKEN", "").strip()
+TOKEN = os.getenv("BOT_TOKEN", "")  # Забезпечте, що змінна середовища правильно встановлена
 
-# Перевірка, чи правильний токен
+# Перевіряємо токен
 if not TOKEN:
-    raise ValueError("Токен бота не знайдено або він порожній! Перевірте налаштування змінної середовища.")
+    raise ValueError("Токен бота не знайдено! Перевірте налаштування змінної середовища.")
 
+# Ініціалізація об'єкта бота
 bot = Bot(token=TOKEN)
-dp = Dispatcher()
+dp = Dispatcher(bot)
 
 async def set_bot_commands():
     commands = [
@@ -23,9 +22,9 @@ async def set_bot_commands():
     await bot.set_my_commands(commands)
 
 async def main():
-    await set_bot_commands()
+    await set_bot_commands()  # Налаштовуємо команди бота
     try:
-        await dp.start_polling(bot)  # Передаємо bot в start_polling
+        await dp.start_polling()  # Запуск опитування
     except Exception as e:
         print(f"Помилка при запуску polling: {e}")
         await bot.close()
