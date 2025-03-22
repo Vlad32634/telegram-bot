@@ -1,9 +1,12 @@
 from aiogram import Bot, Dispatcher, types
-from aiogram.types import BotCommand
+from aiogram.types import BotCommand, ReplyKeyboardMarkup, KeyboardButton
 import os
 import asyncio
 
 TOKEN = os.getenv("BOT_TOKEN", "")
+ADMIN_ID = os.getenv("ADMIN_ID", "")  # Ваш адміністратор ID
+subscribers = {}  # Тут зберігаються підписники
+massage_bookings = {}  # Тут зберігаються записи на масаж
 
 # Перевірка токену
 if not TOKEN:
@@ -22,17 +25,7 @@ async def set_bot_commands():
     ]
     await bot.set_my_commands(commands)
 
-# Обробник команди "/start"
-@dp.message_handler(commands=["start"])
-async def send_welcome(message: types.Message):
-    await message.answer("Привіт! Я бот для масажу.")
-
-# Основна функція
-async def main():
-    await set_bot_commands()  # Налаштовуємо команди
-    await dp.start_polling(bot)   # Запуск polling
-    
-# Головне меню
+# Функція для створення головного меню
 def main_keyboard():
     return ReplyKeyboardMarkup(
         keyboard=[
@@ -43,6 +36,13 @@ def main_keyboard():
         ],
         resize_keyboard=True
     )
+
+# Функція для створення клавіатури з масажами
+def get_massage_keyboard():
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+    for name in MASSAGE_DESCRIPTIONS.keys():
+        keyboard.add(KeyboardButton(text=name))
+    return keyboard
 
 MASSAGE_DESCRIPTIONS = {
     "Класичний масаж": {
