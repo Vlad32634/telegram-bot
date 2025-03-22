@@ -1,23 +1,20 @@
-import os
 from aiogram import Bot, Dispatcher, types
-from aiogram.types import BotCommand
+from aiogram.types import BotCommand, Message
+from aiogram.utils import executor
+import os
 import asyncio
 
-TOKEN = os.getenv("BOT_TOKEN", "")  # Забезпечте, що змінна середовища правильно встановлена
+TOKEN = os.getenv("BOT_TOKEN", "")
 
-# Перевіряємо токен
+# Перевірка токену
 if not TOKEN:
     raise ValueError("Токен бота не знайдено! Перевірте налаштування змінної середовища.")
 
-# Ініціалізація об'єкта бота
+# Ініціалізація бота та диспетчера
 bot = Bot(token=TOKEN)
+dp = Dispatcher(bot)
 
-# Ініціалізація диспетчера без передавання bot в конструктор
-dp = Dispatcher()
-
-# Додаємо bot через метод
-dp.bot = bot
-
+# Функція для налаштування команд бота
 async def set_bot_commands():
     commands = [
         BotCommand(command="start", description="Запустити бота"),
@@ -26,13 +23,15 @@ async def set_bot_commands():
     ]
     await bot.set_my_commands(commands)
 
+# Обробник команди "/start"
+@dp.message_handler(commands=["start"])
+async def send_welcome(message: Message):
+    await message.answer("Привіт! Я бот для масажу.")
+
+# Основна функція
 async def main():
-    await set_bot_commands()  # Налаштовуємо команди бота
-    try:
-        await dp.start_polling()  # Запуск опитування
-    except Exception as e:
-        print(f"Помилка при запуску polling: {e}")
-        await bot.close()
+    await set_bot_commands()  # Налаштовуємо команди
+    await dp.start_polling()   # Запуск polling
         
 # Головне меню
 def main_keyboard():
