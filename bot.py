@@ -90,11 +90,18 @@ async def check_status(message: types.Message):
 @dp.message(lambda message: message.text.lower() == "опис масажів")
 async def show_massage_list(message: types.Message):
     keyboard = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text=name)] for name in MASSAGE_DESCRIPTIONS.keys()],
+        keyboard=[
+            [KeyboardButton(text=name)] for name in MASSAGE_DESCRIPTIONS.keys()
+        ] + [[KeyboardButton(text="🔙 Назад")]],  # Додаємо кнопку "Назад"
         resize_keyboard=True
     )
     await message.answer("Оберіть вид масажу:", reply_markup=keyboard)
-
+    
+# Обробник кнопки "🔙 Назад"
+@dp.message(lambda message: message.text.lower() == "🔙 назад")
+async def go_back(message: types.Message):
+    await message.answer("🔙 Ви повернулися в головне меню.", reply_markup=main_keyboard())
+    
 # Обробник вибору конкретного масажу
 @dp.message(lambda message: message.text in MASSAGE_DESCRIPTIONS)
 async def massage_description_handler(message: types.Message):
