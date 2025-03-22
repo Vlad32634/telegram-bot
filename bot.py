@@ -40,7 +40,7 @@ def main_keyboard():
     )
 
 # Клавіатура для опису масажів
-fdef get_massage_keyboard():
+def get_massage_keyboard():
     keyboard = ReplyKeyboardMarkup(
         resize_keyboard=True
     )
