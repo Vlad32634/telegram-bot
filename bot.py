@@ -1,5 +1,5 @@
 from aiogram import Bot, Dispatcher, types
-from aiogram.types import BotCommand
+from aiogram.types import BotCommand, KeyboardButton, ReplyKeyboardMarkup
 from aiogram.filters import Command
 import os
 import asyncio
@@ -14,34 +14,12 @@ if not TOKEN:
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-# Функція для налаштування команд бота
-async def set_bot_commands():
-    commands = [
-        BotCommand(command="start", description="Запустити бота"),
-        BotCommand(command="broadcast", description="Розсилка (тільки для адміністратора)"),
-        BotCommand(command="subscribers", description="Список підписників (адмін)"),
-    ]
-    await bot.set_my_commands(commands)
+# Зберігання підписників та записів
+subscribers = {}
+massage_bookings = {}
+ADMIN_ID = "YOUR_ADMIN_ID"  # Замініть на свій ID адміністратора
 
-# Функція для створення головного меню
-def main_keyboard():
-    return ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="Записатися на масаж")],
-            [KeyboardButton(text="Перевірити статус")],
-            [KeyboardButton(text="Прайс")],
-            [KeyboardButton(text="Опис масажів")],
-        ],
-        resize_keyboard=True
-    )
-
-# Функція для створення клавіатури з масажами
-def get_massage_keyboard():
-    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-    for name in MASSAGE_DESCRIPTIONS.keys():
-        keyboard.add(KeyboardButton(text=name))
-    return keyboard
-
+# Опис масажів
 MASSAGE_DESCRIPTIONS = {
     "Класичний масаж": {
         "text": "🔹 Класичний масаж покращує кровообіг, знімає напругу м’язів та сприяє загальному розслабленню.",
@@ -73,15 +51,32 @@ MASSAGE_DESCRIPTIONS = {
     }
 }
 
-# Посилання на зображення прайсу
-PRICE_IMAGE_URL = "https://www.dropbox.com/scl/fi/z25kakyigrnuoz5idl1hv/photo_2025-03-20_16-16-36.jpg?rlkey=tszprs745na564o1m9ku5jz26&st=td8us3zu&dl=0"
+# Клавіатури
+def main_keyboard():
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="Записатися на масаж")],
+            [KeyboardButton(text="Перевірити статус")],
+            [KeyboardButton(text="Прайс")],
+            [KeyboardButton(text="Опис масажів")],
+        ],
+        resize_keyboard=True
+    )
 
-# Функція для створення клавіатури з масажами
 def get_massage_keyboard():
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
     for name in MASSAGE_DESCRIPTIONS.keys():
         keyboard.add(KeyboardButton(text=name))
     return keyboard
+
+# Функція для налаштування команд бота
+async def set_bot_commands():
+    commands = [
+        BotCommand(command="start", description="Запустити бота"),
+        BotCommand(command="broadcast", description="Розсилка (тільки для адміністратора)"),
+        BotCommand(command="subscribers", description="Список підписників (адмін)"),
+    ]
+    await bot.set_my_commands(commands)
 
 # Обробник команди "/start"
 @dp.message(Command("start"))
@@ -133,12 +128,13 @@ async def check_status(message: types.Message):
     else:
         await message.answer("ℹ У вас немає запису на масаж. Ви можете записатися через меню.")
 
+# Обробник кнопки "Опис масажів"
 @dp.message(lambda message: message.text == "Опис масажів")
 async def show_massage_list(message: types.Message):
     keyboard = get_massage_keyboard()
     await message.answer("Оберіть вид масажу:", reply_markup=keyboard)
-    
-# Обробник кнопок з описом масажів
+
+# Обробник опису масажу
 @dp.message(lambda message: message.text in MASSAGE_DESCRIPTIONS)
 async def massage_description_handler(message: types.Message):
     massage_type = message.text.strip()
@@ -151,20 +147,16 @@ async def massage_description_handler(message: types.Message):
     else:
         await message.answer("Будь ласка, виберіть масаж із кнопок.")
 
-# Обробка кнопки "Назад"
-@dp.message(lambda message: message.text == "⬅ Назад")
-async def back_to_main_menu(message: types.Message):
-    await message.answer("🔙 Повернення до головного меню", reply_markup=main_keyboard())
-
-# Обробник кнопки "Прайс"
+# Обробка кнопки "Прайс"
 @dp.message(lambda message: message.text.lower() == "прайс")
 async def show_price(message: types.Message):
+    PRICE_IMAGE_URL = "https://www.dropbox.com/scl/fi/z25kakyigrnuoz5idl1hv/photo_2025-03-20_16-16-36.jpg?rlkey=tszprs745na564o1m9ku5jz26&st=td8us3zu&dl=0"
     try:
         await message.answer_photo(PRICE_IMAGE_URL, caption="Ось наш прайс 📋")
     except Exception as e:
         await message.answer("⚠ Виникла помилка при відправці прайсу.")
         print(f"Помилка: {e}")
-        
+
 # Обробник команди /subscribers (тільки для адміністратора)
 @dp.message(Command("subscribers"))
 async def list_subscribers(message: types.Message):
