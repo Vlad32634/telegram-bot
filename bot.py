@@ -1,22 +1,19 @@
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import BotCommand, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.filters import Command
-import os
 import asyncio
+import os
 
 TOKEN = os.getenv("BOT_TOKEN", "")
 
-# Перевірка токену
 if not TOKEN:
     raise ValueError("Токен бота не знайдено! Перевірте налаштування змінної середовища.")
 
-# Ініціалізація бота
+# Ініціалізація бота та диспетчера
 bot = Bot(token=TOKEN)
+dp = Dispatcher()  # В aiogram v3 Dispatcher не приймає бот як аргумент
 
-# Ініціалізація диспетчера через from_connection
-dp = Dispatcher.from_connection(bot)
-
-# Функція для налаштування команд бота
+# Функція для налаштування команд
 async def set_bot_commands():
     commands = [
         BotCommand(command="start", description="Запустити бота"),
@@ -25,7 +22,7 @@ async def set_bot_commands():
     ]
     await bot.set_my_commands(commands)
 
-# Функція для створення головного меню
+# Головне меню
 def main_keyboard():
     return ReplyKeyboardMarkup(
         keyboard=[
@@ -72,14 +69,11 @@ MASSAGE_DESCRIPTIONS = {
 # Посилання на зображення прайсу
 PRICE_IMAGE_URL = "https://www.dropbox.com/scl/fi/z25kakyigrnuoz5idl1hv/photo_2025-03-20_16-16-36.jpg?rlkey=tszprs745na564o1m9ku5jz26&st=td8us3zu&dl=0"
 
-# Обробник команди "/start"
+# Обробник команди /start
 @dp.message(Command("start"))
 async def start_handler(message: types.Message):
-    user_id = message.chat.id
-    username = message.from_user.username or "Немає юзернейму"
-    
     await message.answer("Привіт! Я бот для запису на масаж.", reply_markup=main_keyboard())
-
+    
 # Обробник кнопки "Записатися на масаж"
 @dp.message(lambda message: message.text.lower() == "записатися на масаж")
 async def book_massage(message: types.Message):
@@ -119,10 +113,11 @@ async def show_price(message: types.Message):
         await message.answer("⚠ Виникла помилка при відправці прайсу.")
         print(f"Помилка: {e}")
 
-# Основний цикл бота
+# Реєстрація хендлерів
 async def main():
-    await set_bot_commands()  # Налаштування команд бота
-    await dp.start_polling()  # Початок опитування бота
+    dp.include_router(dp)  # В aiogram v3 треба вручну додавати роутери
+    await set_bot_commands()
+    await dp.start_polling(bot)
 
 if __name__ == "__main__":
     asyncio.run(main())
