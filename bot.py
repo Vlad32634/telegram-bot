@@ -86,7 +86,7 @@ def get_massage_keyboard():
     return keyboard
 
 # Обробник команди /start
-@dp.message(Command("start"))
+@dp.message_handler(commands=["start"])
 async def start_handler(message: types.Message):
     user_id = message.chat.id
     username = message.from_user.username or "Немає юзернейму"
