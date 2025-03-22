@@ -10,9 +10,11 @@ TOKEN = os.getenv("BOT_TOKEN", "")
 if not TOKEN:
     raise ValueError("Токен бота не знайдено! Перевірте налаштування змінної середовища.")
 
-# Ініціалізація бота та диспетчера
+# Ініціалізація бота
 bot = Bot(token=TOKEN)
-dp = Dispatcher(bot)  # Диспетчер ініціалізовано з екземпляром бота
+
+# Ініціалізація диспетчера через from_connection
+dp = Dispatcher.from_connection(bot)
 
 # Функція для налаштування команд бота
 async def set_bot_commands():
@@ -49,9 +51,21 @@ MASSAGE_DESCRIPTIONS = {
         "text": "🔹 Антицелюлітний масаж спрямований на зменшення целюліту та покращення стану шкіри.",
         "photo": "https://www.dropbox.com/scl/fi/d8d34lezl9ge2hlkkuxue/photo_2025-03-22_14-09-40.jpg?rlkey=wkb3ksrjf25kj50z89jy80qnw&st=b24bzdat&dl=0"
     },
-    "Лікувальний масаж": {
+   "Лікувальний масаж": {
         "text": "🔹 Лікувальний масаж допомагає зменшити біль у м’язах, поліпшити рухливість суглобів та відновити після травм.",
         "photo": "https://www.dropbox.com/scl/fi/60sv4y1kclksev8prax8q/photo_2025-03-22_14-09-43.jpg?rlkey=lanlkah8i13b1ybbmtrvo2hrv&st=n7hf2trt&dl=0"
+    },
+    "Міофасціальний масаж": {
+        "text": "🔹 Міофасціальний масаж працює з глибокими тканинами, розслаблюючи м’язові затиски та покращуючи еластичність.",
+        "photo": "https://www.dropbox.com/scl/fi/zt684u4jbys916pb058q1/photo_2025-03-22_14-09-46.jpg?rlkey=ytv7yxle9hynmyznct6tbynhr&st=96ook5os&dl=0"
+    },
+    "Вакуумний масаж": {
+        "text": "🔹 Вакуумний масаж стимулює кровообіг, допомагає позбутися застійних явищ та покращує стан шкіри.",
+        "photo": "https://www.dropbox.com/scl/fi/ip6fxmwsnhadynfxad4a6/photo_2025-03-22_14-09-48.jpg?rlkey=rebf46es2hatcfqv2z1dndh8i&st=9hyufeth&dl=0"
+    },
+    "Креольський масаж": {
+        "text": "🔹 Креольський масаж виконується за допомогою спеціальних бамбукових паличок для глибокого впливу на тканини.",
+        "photo": "https://www.dropbox.com/scl/fi/ped1ssk7o1awe2i3n9pvv/photo_2025-03-22_14-09-50.jpg?rlkey=ifotepuj04tex8w9vr9kc707b&st=lk0l5oq9&dl=0"
     }
 }
 
