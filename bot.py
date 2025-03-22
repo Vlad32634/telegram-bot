@@ -57,7 +57,7 @@ def get_massage_keyboard():
         KeyboardButton(text="Креольський масаж"),
         KeyboardButton(text="⬅ Назад")
     )
-    
+
     # Додаємо кнопки для кожного типу масажу з MASSAGE_DESCRIPTIONS
     for name in MASSAGE_DESCRIPTIONS.keys():
         keyboard.add(KeyboardButton(text=name))
