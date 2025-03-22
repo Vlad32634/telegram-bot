@@ -11,7 +11,7 @@ if not TOKEN:
 
 # Ініціалізація бота та диспетчера
 bot = Bot(token=TOKEN)
-dp = Dispatcher(bot)
+dp = Dispatcher(bot=bot)  # Параметр bot передається явно
 
 # Функція для налаштування команд бота
 async def set_bot_commands():
