@@ -1,12 +1,10 @@
 from aiogram import Bot, Dispatcher, types
-from aiogram.types import BotCommand, ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import BotCommand
+from aiogram.filters import Command
 import os
 import asyncio
 
 TOKEN = os.getenv("BOT_TOKEN", "")
-ADMIN_ID = os.getenv("ADMIN_ID", "")  # Ваш адміністратор ID
-subscribers = {}  # Тут зберігаються підписники
-massage_bookings = {}  # Тут зберігаються записи на масаж
 
 # Перевірка токену
 if not TOKEN:
@@ -21,7 +19,7 @@ async def set_bot_commands():
     commands = [
         BotCommand(command="start", description="Запустити бота"),
         BotCommand(command="broadcast", description="Розсилка (тільки для адміністратора)"),
-        BotCommand(command="subscribers", description="Список підписників (адмін)")
+        BotCommand(command="subscribers", description="Список підписників (адмін)"),
     ]
     await bot.set_my_commands(commands)
 
@@ -85,8 +83,8 @@ def get_massage_keyboard():
         keyboard.add(KeyboardButton(text=name))
     return keyboard
 
-# Обробник команди /start
-@dp.message_handler(commands=["start"])
+# Обробник команди "/start"
+@dp.message(Command("start"))
 async def start_handler(message: types.Message):
     user_id = message.chat.id
     username = message.from_user.username or "Немає юзернейму"
