@@ -39,12 +39,12 @@ def main_keyboard():
         resize_keyboard=True
     )
 
-# Клавіатура для опису масажів
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+
 # Клавіатура для опису масажів
 def get_massage_keyboard():
-    keyboard = ReplyKeyboardMarkup(
-        resize_keyboard=True  # це має бути в середині конструктора
-    )
+    # Створюємо клавіатуру з параметром resize_keyboard
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
 
     # Додаємо стандартні кнопки
     keyboard.add(
@@ -57,7 +57,7 @@ def get_massage_keyboard():
         KeyboardButton(text="Креольський масаж"),
         KeyboardButton(text="⬅ Назад")
     )
-
+    
     # Додаємо кнопки для кожного типу масажу з MASSAGE_DESCRIPTIONS
     for name in MASSAGE_DESCRIPTIONS.keys():
         keyboard.add(KeyboardButton(text=name))
