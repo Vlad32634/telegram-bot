@@ -142,16 +142,13 @@ async def check_status(message: types.Message):
         await message.answer("ℹ У вас немає запису на масаж. Ви можете записатися через меню.")
 
 # Обробник кнопок з описом масажів
-@dp.message(lambda message: message.text in MASSAGE_DESCRIPTIONS)
-async def massage_description_handler(message: types.Message):
-    massage_type = message.text
-    description = MASSAGE_DESCRIPTIONS[massage_type]["text"]
-    photo = MASSAGE_DESCRIPTIONS[massage_type]["photo"]
-
-    if photo.startswith("http"):  # Якщо це посилання
-        await message.answer(description + f"\n🎥 [фото]({photo})", parse_mode="Markdown")
-    else:  # Якщо це file_id з Telegram
-        await message.answer_photo(photo, caption=description)
+@dp.message(lambda message: message.text.lower() == "опис масажів")
+async def show_massage_list(message: types.Message):
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text=name)] for name in MASSAGE_DESCRIPTIONS.keys()],
+        resize_keyboard=True
+    )
+    await message.answer("Оберіть вид масажу:", reply_markup=keyboard)
         
 # Обробка вибору масажу
 @dp.message(lambda message: message.text in MASSAGE_DESCRIPTIONS)
