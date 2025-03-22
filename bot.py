@@ -44,18 +44,18 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 # Клавіатура для опису масажів
 def get_massage_keyboard():
     # Створюємо клавіатуру з параметром resize_keyboard
-    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-
-    # Додаємо стандартні кнопки
-    keyboard.add(
-        KeyboardButton(text="Класичний масаж"),
-        KeyboardButton(text="Лімфодренажний масаж"),
-        KeyboardButton(text="Антицелюлітний масаж"),
-        KeyboardButton(text="Лікувальний масаж"),
-        KeyboardButton(text="Міофасціальний масаж"),
-        KeyboardButton(text="Вакуумний масаж"),
-        KeyboardButton(text="Креольський масаж"),
-        KeyboardButton(text="⬅ Назад")
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="Класичний масаж")],
+            [KeyboardButton(text="Лімфодренажний масаж")],
+            [KeyboardButton(text="Антицелюлітний масаж")],
+            [KeyboardButton(text="Лікувальний масаж")],
+            [KeyboardButton(text="Міофасціальний масаж")],
+            [KeyboardButton(text="Вакуумний масаж")],
+            [KeyboardButton(text="Креольський масаж")],
+            [KeyboardButton(text="⬅ Назад")]
+        ],
+        resize_keyboard=True
     )
 
     # Додаємо кнопки для кожного типу масажу з MASSAGE_DESCRIPTIONS
@@ -63,7 +63,7 @@ def get_massage_keyboard():
         keyboard.add(KeyboardButton(text=name))
 
     return keyboard
-
+    
 MASSAGE_DESCRIPTIONS = {
     "Класичний масаж": {
         "text": "🔹 Класичний масаж покращує кровообіг, знімає напругу м’язів та сприяє загальному розслабленню.",
