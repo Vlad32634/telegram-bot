@@ -11,7 +11,7 @@ if not TOKEN:
 
 # Ініціалізація об'єкта бота
 bot = Bot(token=TOKEN)
-dp = Dispatcher(bot)
+dp = Dispatcher(bot)  # Використовуємо Dispatcher з параметром bot
 
 async def set_bot_commands():
     commands = [
@@ -28,7 +28,7 @@ async def main():
     except Exception as e:
         print(f"Помилка при запуску polling: {e}")
         await bot.close()
-
+        
 # Головне меню
 def main_keyboard():
     return ReplyKeyboardMarkup(
