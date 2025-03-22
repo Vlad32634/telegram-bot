@@ -28,7 +28,6 @@ async def set_bot_commands():
     await bot.set_my_commands(commands)
 
 # Головне меню
-
 def main_keyboard():
     return ReplyKeyboardMarkup(
         keyboard=[
@@ -41,7 +40,6 @@ def main_keyboard():
     )
 
 # Клавіатура для опису масажів
-
 def massage_description_keyboard():
     return ReplyKeyboardMarkup(
         keyboard=[
@@ -60,7 +58,7 @@ def massage_description_keyboard():
 MASSAGE_DESCRIPTIONS = {
     "Класичний масаж": {
         "text": "🔹 Класичний масаж покращує кровообіг, знімає напругу м’язів та сприяє загальному розслабленню.",
-        "photo": "https://www.dropbox.com/scl/fi/n74kdxul6vqv995tkvrbm/photo_2025-03-22_14-09-52.jpg?rlkey=lh7h8hpzytjyuhxzs22qkg1z6&st=vtixsvbg&dl=0" 
+        "photo": "https://www.dropbox.com/scl/fi/n74kdxul6vqv995tkvrbm/photo_2025-03-22_14-09-52.jpg?rlkey=lh7h8hpzytjyuhxzs22qkg1z6&st=vtixsvbg&dl=0"
     },
     "Лімфодренажний масаж": {
         "text": "🔹 Лімфодренажний масаж допомагає вивести зайву рідину, зменшити набряки та покращити обмін речовин.",
@@ -149,7 +147,7 @@ def get_massage_keyboard():
     return keyboard
 
 # Обробник кнопки "Опис масажів"
-@dp.message_handler(lambda message: message.text == "Опис масажів")
+@dp.message(lambda message: message.text == "Опис масажів")
 async def show_massage_list(message: types.Message):
     keyboard = get_massage_keyboard()
     await message.answer("Оберіть вид масажу:", reply_markup=keyboard)
@@ -167,7 +165,6 @@ async def massage_description_handler(message: types.Message):
     else:
         await message.answer("Будь ласка, виберіть масаж із кнопок.")
 
-
 # Обробка кнопки "Назад"
 @dp.message(lambda message: message.text == "⬅ Назад")
 async def back_to_main_menu(message: types.Message):
@@ -176,8 +173,6 @@ async def back_to_main_menu(message: types.Message):
 # Обробник кнопки "Прайс"
 @dp.message(lambda message: message.text.lower() == "прайс")
 async def show_price(message: types.Message):
-    PRICE_IMAGE_URL = "https://www.dropbox.com/scl/fi/z25kakyigrnuoz5idl1hv/photo_2025-03-20_16-16-36.jpg?rlkey=tszprs745na564o1m9ku5jz26&st=td8us3zu&dl=0" 
-
     try:
         await message.answer_photo(PRICE_IMAGE_URL, caption="Ось наш прайс 📋")
     except Exception as e:
