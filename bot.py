@@ -66,10 +66,10 @@ MASSAGE_DESCRIPTIONS = {
     "Вакуумний масаж": "Опис вакуумного масажу...",
     "Креольський масаж": "Опис креольського масажу..."
 }
-
         resize_keyboard=True
     )
-    return keyboard
+    
+return keyboard
 
 MASSAGE_DESCRIPTIONS = {
     "Класичний масаж": {
