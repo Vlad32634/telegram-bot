@@ -40,8 +40,10 @@ def main_keyboard():
     )
 
 # Клавіатура для опису масажів
-def massage_description_keyboard():
-    return ReplyKeyboardMarkup(
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+
+def get_massage_keyboard():
+    keyboard = ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="Класичний масаж")],
             [KeyboardButton(text="Лімфодренажний масаж")],
@@ -54,6 +56,7 @@ def massage_description_keyboard():
         ],
         resize_keyboard=True
     )
+    return keyboard
 
 MASSAGE_DESCRIPTIONS = {
     "Класичний масаж": {
