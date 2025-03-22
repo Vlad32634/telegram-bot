@@ -57,16 +57,36 @@ def massage_description_keyboard():
         resize_keyboard=True
     )
 
-# Опис масажів
 MASSAGE_DESCRIPTIONS = {
-    "Класичний масаж": "🔹 Класичний масаж покращує кровообіг, знімає напругу м’язів та сприяє загальному розслабленню.",
-    "Лімфодренажний масаж": "🔹 Лімфодренажний масаж допомагає вивести зайву рідину, зменшити набряки та покращити обмін речовин.",
-    "Антицелюлітний масаж": "🔹 Антицелюлітний масаж спрямований на зменшення целюліту та покращення стану шкіри.",
-    "Лікувальний масаж": "🔹 Лікувальний масаж допомагає зменшити біль у м’язах, поліпшити рухливість суглобів та відновити після травм.",
-    "Міофасціальний масаж": "🔹 Міофасціальний масаж працює з глибокими тканинами, розслаблюючи м’язові затиски та покращуючи еластичність.",
-    "Вакуумний масаж": "🔹 Вакуумний масаж стимулює кровообіг, допомагає позбутися застійних явищ та покращує стан шкіри.",
-    "Креольський масаж": "🔹 Креольський масаж виконується за допомогою спеціальних бамбукових паличок для глибокого впливу на тканини."
-}
+    "Класичний масаж": {
+        "text": "🔹 Класичний масаж покращує кровообіг, знімає напругу м’язів та сприяє загальному розслабленню.",
+        "photo": "https://www.dropbox.com/scl/fi/n74kdxul6vqv995tkvrbm/photo_2025-03-22_14-09-52.jpg?rlkey=lh7h8hpzytjyuhxzs22qkg1z6&st=vtixsvbg&dl=0" 
+    },
+    "Лімфодренажний масаж": {
+        "text": "🔹 Лімфодренажний масаж допомагає вивести зайву рідину, зменшити набряки та покращити обмін речовин.",
+        "photo": "https://www.dropbox.com/scl/fi/w74j44zoxlbqzrabnze3s/photo_2025-03-22_14-09-37.jpg?rlkey=4l22scog50x46vcga56glqobf&st=2n978nt4&dl=0"
+    },
+    "Антицелюлітний масаж": {
+        "text": "🔹 Антицелюлітний масаж спрямований на зменшення целюліту та покращення стану шкіри.",
+        "photo": "https://www.dropbox.com/scl/fi/d8d34lezl9ge2hlkkuxue/photo_2025-03-22_14-09-40.jpg?rlkey=wkb3ksrjf25kj50z89jy80qnw&st=b24bzdat&dl=0"
+    },
+    "Лікувальний масаж": {
+        "text": "🔹 Лікувальний масаж допомагає зменшити біль у м’язах, поліпшити рухливість суглобів та відновити після травм.",
+        "photo": "https://www.dropbox.com/scl/fi/60sv4y1kclksev8prax8q/photo_2025-03-22_14-09-43.jpg?rlkey=lanlkah8i13b1ybbmtrvo2hrv&st=n7hf2trt&dl=0"
+    },
+    "Міофасціальний масаж": {
+        "text": "🔹 Міофасціальний масаж працює з глибокими тканинами, розслаблюючи м’язові затиски та покращуючи еластичність.",
+        "photo": "https://www.dropbox.com/scl/fi/zt684u4jbys916pb058q1/photo_2025-03-22_14-09-46.jpg?rlkey=ytv7yxle9hynmyznct6tbynhr&st=96ook5os&dl=0"
+    },
+    "Вакуумний масаж": {
+        "text": "🔹 Вакуумний масаж стимулює кровообіг, допомагає позбутися застійних явищ та покращує стан шкіри.",
+        "photo": "https://www.dropbox.com/scl/fi/ip6fxmwsnhadynfxad4a6/photo_2025-03-22_14-09-48.jpg?rlkey=rebf46es2hatcfqv2z1dndh8i&st=9hyufeth&dl=0"
+    },
+    "Креольський масаж": {
+        "text": "🔹 Креольський масаж виконується за допомогою спеціальних бамбукових паличок для глибокого впливу на тканини.",
+        "photo": "https://www.dropbox.com/scl/fi/ped1ssk7o1awe2i3n9pvv/photo_2025-03-22_14-09-50.jpg?rlkey=ifotepuj04tex8w9vr9kc707b&st=lk0l5oq9&dl=0"
+    }
+
 
 # Посилання на зображення прайсу
 PRICE_IMAGE_URL = "https://www.dropbox.com/scl/fi/z25kakyigrnuoz5idl1hv/photo_2025-03-20_16-16-36.jpg?rlkey=tszprs745na564o1m9ku5jz26&st=td8us3zu&dl=0"
@@ -121,11 +141,18 @@ async def check_status(message: types.Message):
     else:
         await message.answer("ℹ У вас немає запису на масаж. Ви можете записатися через меню.")
 
-# Обробник кнопки "Опис масажів"
-@dp.message(lambda message: message.text and message.text.lower() == "опис масажів")
-async def show_massage_options(message: types.Message):
-    await message.answer("Оберіть тип масажу для детального опису:", reply_markup=massage_description_keyboard())
+# Обробник кнопок з описом масажів
+@dp.message(lambda message: message.text in MASSAGE_DESCRIPTIONS)
+async def massage_description_handler(message: types.Message):
+    massage_type = message.text
+    description = MASSAGE_DESCRIPTIONS[massage_type]["text"]
+    photo = MASSAGE_DESCRIPTIONS[massage_type]["photo"]
 
+    if photo.startswith("http"):  # Якщо це посилання
+        await message.answer(description + f"\n🎥 [фото]({photo})", parse_mode="Markdown")
+    else:  # Якщо це file_id з Telegram
+        await message.answer_photo(photo, caption=description)
+        
 # Обробка вибору масажу
 @dp.message(lambda message: message.text in MASSAGE_DESCRIPTIONS)
 async def show_massage_description(message: types.Message):
