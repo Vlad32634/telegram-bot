@@ -171,7 +171,7 @@ async def start_handler(message: types.Message):
         "Обирайте потрібний розділ нижче 👇"
     )
 
-    WELCOME_PHOTO_URL = "https://твоє_посилання_на_фото"
+    WELCOME_PHOTO_URL = "https://www.dropbox.com/scl/fi/cdcdcurqd5drqazmb1qem/.jpg?rlkey=qelj9sfhpalt7xdynzbwoajxo&st=7cyakdtf&dl=0"
 
     await bot.send_photo(message.chat.id, WELCOME_PHOTO_URL, caption=welcome_text, reply_markup=main_keyboard())
     
