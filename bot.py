@@ -64,7 +64,7 @@ async def set_bot_commands():
 
 async def notify_admin(text):
     try:
-        await bot.send_message(ADMIN_ID, text)
+        await bot.send_message(ADMIN_IDS, text)
     except Exception as e:
         print(f"Не вдалося надіслати повідомлення адміну: {e}")
 
