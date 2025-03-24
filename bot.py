@@ -6,9 +6,11 @@ import os
 
 TOKEN = os.getenv("BOT_TOKEN", "")
 ADMIN_IDS = os.getenv("ADMIN_IDS", "")
-
+WELCOME_PHOTO_URL = "https://www.dropbox.com/scl/fi/cdcdcurqd5drqazmb1qem/.jpg?rlkey=qelj9sfhpalt7xdynzbwoajxo&st=7cyakdtf&dl=0"  
 if not TOKEN:
     raise ValueError("Токен бота не знайдено! Перевірте налаштування змінної середовища.")
+if not ADMIN_IDS:
+    raise ValueError("ADMIN_IDS не встановлено в змінних середовища.")
 
 # Ініціалізація бота та диспетчера
 bot = Bot(token=TOKEN)
@@ -59,6 +61,12 @@ async def set_bot_commands():
         BotCommand(command="subscribers", description="Список підписників (адмін)"),
     ]
     await bot.set_my_commands(commands)
+
+async def notify_admin(text):
+    try:
+        await bot.send_message(ADMIN_ID, text)
+    except Exception as e:
+        print(f"Не вдалося надіслати повідомлення адміну: {e}")
 
 # Обробник команди /broadcast (розсилка)
 @router.message(Command("broadcast"))
@@ -154,7 +162,7 @@ async def start_handler(message: types.Message):
         subscribers.add(user_id)
         await notify_admins(f"➕ Новий підписник: {message.from_user.full_name} (@{message.from_user.username}, ID: {user_id})")
 
-    await message.answer("Привіт! Я бот для запису на масаж.", reply_markup=main_keyboard())
+    await bot.send_photo(message.chat.id, WELCOME_PHOTO_URL, caption="Привіт! Я бот для запису на масаж.")
 
 # Функція для надсилання повідомлення адміністраторам
 async def notify_admins(text):
@@ -208,6 +216,7 @@ async def show_price(message: types.Message):
 async def main():
     await set_bot_commands()
     dp.include_router(router)
+    await notify_admin("✅ Бот запущено!")
     await dp.start_polling(bot)
 
 # Стартуємо бота
