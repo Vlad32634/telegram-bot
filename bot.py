@@ -1,18 +1,26 @@
 from aiogram import Bot, Dispatcher, Router, types
 from aiogram.types import BotCommand, ReplyKeyboardMarkup, KeyboardButton
-from aiogram.filters import Command
+from aiogram.filters import Command, CommandObject
 import asyncio
 import os
 
 TOKEN = os.getenv("BOT_TOKEN", "")
+ADMIN_IDS = os.getenv("ADMIN_IDS", "")
 
 if not TOKEN:
     raise ValueError("Токен бота не знайдено! Перевірте налаштування змінної середовища.")
 
 # Ініціалізація бота та диспетчера
 bot = Bot(token=TOKEN)
-dp = Dispatcher()  # Dispatcher створюється без аргументів
-router = Router()  # Окремий Router для хендлерів
+dp = Dispatcher()
+router = Router()
+
+# Список підписників
+subscribers = set()
+
+# Функція перевірки, чи є користувач адміністратором
+def is_admin(user_id):
+    return str(user_id) in ADMIN_IDS.split(",")
 
 # Функція для налаштування команд
 async def set_bot_commands():
@@ -23,18 +31,44 @@ async def set_bot_commands():
     ]
     await bot.set_my_commands(commands)
 
-# Головне меню
-def main_keyboard():
-    keyboard = ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="Записатися на масаж")],
-            [KeyboardButton(text="Перевірити статус")],
-            [KeyboardButton(text="Прайс")],
-            [KeyboardButton(text="Опис масажів")]
-        ],
-        resize_keyboard=True
-    )  
-    return keyboard  
+# Обробник команди /broadcast (розсилка)
+@router.message(Command("broadcast"))
+async def broadcast_handler(message: types.Message):
+    if not is_admin(message.from_user.id):
+        await message.answer("❌ У вас немає прав для виконання цієї команди.")
+        return
+
+    broadcast_text = (
+        "Добрий день 😊\n\n"
+        "Чи Вам не пора записатись на масаж? 💆‍♂️💆‍♀️\n"
+        "Якщо Ви в мене вже були, для Вас знижка на масаж 20% до кінця цієї неділі! 🎉\n"
+        "Якщо будете вперше, також знижка 20%! 🔥\n\n"
+        "Подбайте про себе ❤️"
+    )
+
+    sent_count = 0
+    for user_id in subscribers:
+        try:
+            await bot.send_message(user_id, broadcast_text)
+            sent_count += 1
+        except Exception as e:
+            print(f"❌ Не вдалося надіслати повідомлення {user_id}: {e}")
+
+    await message.answer(f"✅ Повідомлення надіслано {sent_count} користувачам.")
+
+# Обробник команди /subscribers (список підписників)
+@router.message(Command("subscribers"))
+async def subscribers_handler(message: types.Message):
+    if not is_admin(message.from_user.id):
+        await message.answer("❌ У вас немає прав для перегляду підписників.")
+        return
+
+    if not subscribers:
+        await message.answer("📋 Підписників ще немає.")
+        return
+
+    subscriber_list = "\n".join([f"🆔 {user_id}" for user_id in subscribers])
+    await message.answer(f"📋 Список підписників:\n{subscriber_list}")
     
 # Опис масажів
 MASSAGE_DESCRIPTIONS = {
