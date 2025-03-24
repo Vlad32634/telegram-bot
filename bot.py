@@ -162,7 +162,7 @@ async def start_handler(message: types.Message):
         subscribers.add(user_id)
         await notify_admins(f"➕ Новий підписник: {message.from_user.full_name} (@{message.from_user.username}, ID: {user_id})")
 
-welcome_text = (
+    welcome_text = (
         "Привіт! Мене звати Влад, я масажист і реабілітолог 👨‍⚕️ з досвідом понад 5 років.\n"
         "В моєму телеграм-боті ви можете:\n"
         "✔ Записатися на масаж\n"
@@ -171,8 +171,10 @@ welcome_text = (
         "Обирайте потрібний розділ нижче 👇"
     )
 
-await bot.send_photo(message.chat.id, WELCOME_PHOTO_URL, caption=welcome_text, reply_markup=main_keyboard())
+    WELCOME_PHOTO_URL = "https://твоє_посилання_на_фото"
 
+    await bot.send_photo(message.chat.id, WELCOME_PHOTO_URL, caption=welcome_text, reply_markup=main_keyboard())
+    
 # Функція для надсилання повідомлення адміністраторам
 async def notify_admins(text):
     for admin_id in ADMIN_IDS.split(","):
