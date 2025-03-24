@@ -1,6 +1,6 @@
 from aiogram import Bot, Dispatcher, Router, types
 from aiogram.types import BotCommand, ReplyKeyboardMarkup, KeyboardButton
-from aiogram.filters import Command, CommandObject
+from aiogram.filters import Command
 import asyncio
 import os
 
@@ -20,7 +20,7 @@ subscribers = set()
 
 # Функція перевірки, чи є користувач адміністратором
 def is_admin(user_id):
-    admin_ids = os.getenv("ADMIN_IDS", "").split(",")
+    admin_ids = ADMIN_IDS.split(",") if ADMIN_IDS else []
     admin_ids = [admin_id.strip() for admin_id in admin_ids if admin_id.strip().isdigit()]
     return str(user_id) in admin_ids
 
@@ -119,15 +119,29 @@ def main_keyboard():
     )
     return keyboard
     
-# Обробник команди /start (реєструємо його у router, а не в dp)
+# Обробник команди /start
 @router.message(Command("start"))
 async def start_handler(message: types.Message):
+    user_id = str(message.from_user.id)
+    if user_id not in subscribers:
+        subscribers.add(user_id)
+        await notify_admins(f"➕ Новий підписник: {message.from_user.full_name} (@{message.from_user.username}, ID: {user_id})")
+    
     await message.answer("Привіт! Я бот для запису на масаж.", reply_markup=main_keyboard())
+
+# Функція для надсилання повідомлення адміністраторам
+async def notify_admins(text):
+    for admin_id in ADMIN_IDS.split(","):
+        try:
+            await bot.send_message(admin_id.strip(), text)
+        except Exception as e:
+            print(f"❌ Не вдалося надіслати повідомлення адміну {admin_id}: {e}")
     
 # Обробник кнопки "Записатися на масаж"
-@dp.message(lambda message: message.text.lower() == "записатися на масаж")
+@router.message(lambda message: message.text.lower() == "записатися на масаж")
 async def book_massage(message: types.Message):
     await message.answer("✅ Ви записалися на масаж. З вами зв'яжеться масажист.")
+    await notify_admins(f"📅 Новий запис на масаж: {message.from_user.full_name} (@{message.from_user.username}, ID: {message.from_user.id})")
 
 # Обробник кнопки "Перевірити статус"
 @dp.message(lambda message: message.text.lower() == "перевірити статус")
