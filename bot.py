@@ -20,7 +20,9 @@ subscribers = set()
 
 # Функція перевірки, чи є користувач адміністратором
 def is_admin(user_id):
-    return str(user_id) in ADMIN_IDS.split(",")
+    admin_ids = os.getenv("ADMIN_IDS", "").split(",")
+    admin_ids = [admin_id.strip() for admin_id in admin_ids if admin_id.strip().isdigit()]
+    return str(user_id) in admin_ids
 
 # Функція для налаштування команд
 async def set_bot_commands():
