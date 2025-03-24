@@ -105,6 +105,18 @@ MASSAGE_DESCRIPTIONS = {
 # Посилання на зображення прайсу
 PRICE_IMAGE_URL = "https://www.dropbox.com/scl/fi/z25kakyigrnuoz5idl1hv/photo_2025-03-20_16-16-36.jpg?rlkey=tszprs745na564o1m9ku5jz26&st=td8us3zu&dl=0"
 
+# Функція для створення головної клавіатури
+def main_keyboard():
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="Записатися на масаж")],
+            [KeyboardButton(text="Опис масажів"), KeyboardButton(text="Прайс")],
+            [KeyboardButton(text="Перевірити статус")]
+        ],
+        resize_keyboard=True
+    )
+    return keyboard
+    
 # Обробник команди /start (реєструємо його у router, а не в dp)
 @router.message(Command("start"))
 async def start_handler(message: types.Message):
