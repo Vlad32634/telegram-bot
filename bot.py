@@ -18,11 +18,41 @@ router = Router()
 # Список підписників
 subscribers = set()
 
-# Функція перевірки, чи є користувач адміністратором
+# Отримуємо список ID адміністратора із змінної середовища
+ADMIN_IDS = os.getenv("ADMIN_IDS")
+
+# Перевіряємо, чи є ADMIN_IDS у змінних середовища
+if not ADMIN_IDS:
+    print("❌ Не знайдено ADMIN_IDS у змінних середовища.")
+else:
+    print(f"ADMIN_IDS: {ADMIN_IDS}")
+
+# Функція для перевірки, чи є користувач адміністратором
 def is_admin(user_id):
     admin_ids = ADMIN_IDS.split(",") if ADMIN_IDS else []
     admin_ids = [admin_id.strip() for admin_id in admin_ids if admin_id.strip().isdigit()]
     return str(user_id) in admin_ids
+
+# Функція для надсилання повідомлення адміністраторам
+async def notify_admins(text):
+    if not ADMIN_IDS:
+        print("❌ Немає ID адміністратора у змінній середовища ADMIN_IDS.")
+        return
+
+    admin_ids = ADMIN_IDS.split(",")
+    for admin_id in admin_ids:
+        admin_id = admin_id.strip()
+        if not admin_id.isdigit():
+            print(f"❌ Невірний ID адміністратора: {admin_id}")
+            continue
+
+        try:
+            await bot.send_message(admin_id, text)
+        except Exception as e:
+            print(f"❌ Не вдалося надіслати повідомлення адміну {admin_id}: {e}")
+
+# Приклад виклику функції notify_admins
+await notify_admins("📅 Новий запис на масаж: Олег Іванов (@oleg_ivanov, ID: 123456789)")
 
 # Функція для налаштування команд
 async def set_bot_commands():
