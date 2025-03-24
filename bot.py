@@ -50,10 +50,7 @@ async def notify_admins(text):
             await bot.send_message(admin_id, text)
         except Exception as e:
             print(f"❌ Не вдалося надіслати повідомлення адміну {admin_id}: {e}")
-
-# Приклад виклику функції notify_admins
-await notify_admins("📅 Новий запис на масаж: Олег Іванов (@oleg_ivanov, ID: 123456789)")
-
+            
 # Функція для налаштування команд
 async def set_bot_commands():
     commands = [
