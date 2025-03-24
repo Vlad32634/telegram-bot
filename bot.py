@@ -86,7 +86,7 @@ MASSAGE_DESCRIPTIONS = {
         "text": "🔹 Антицелюлітний масаж спрямований на зменшення целюліту та покращення стану шкіри.",
         "photo": "https://www.dropbox.com/scl/fi/d8d34lezl9ge2hlkkuxue/photo_2025-03-22_14-09-40.jpg?rlkey=wkb3ksrjf25kj50z89jy80qnw&st=b24bzdat&dl=0"
     },
-   "Лікувальний масаж": {
+    "Лікувальний масаж": {
         "text": "🔹 Лікувальний масаж допомагає зменшити біль у м’язах, поліпшити рухливість суглобів та відновити після травм.",
         "photo": "https://www.dropbox.com/scl/fi/60sv4y1kclksev8prax8q/photo_2025-03-22_14-09-43.jpg?rlkey=lanlkah8i13b1ybbmtrvo2hrv&st=n7hf2trt&dl=0"
     },
@@ -159,36 +159,29 @@ async def show_massage_list(message: types.Message):
     )
     await message.answer("Оберіть вид масажу:", reply_markup=keyboard)
     
-# Обробник кнопки "🔙 Назад"
-@dp.message(lambda message: message.text.lower() == "🔙 назад")
-async def go_back(message: types.Message):
-    await message.answer("🔙 Ви повернулися в головне меню.", reply_markup=main_keyboard())
-    
-# Обробник вибору конкретного масажу
-@dp.message(lambda message: message.text in MASSAGE_DESCRIPTIONS)
-async def massage_description_handler(message: types.Message):
-    massage_type = message.text.strip()
-    
-    if massage_type in MASSAGE_DESCRIPTIONS:
-        description = MASSAGE_DESCRIPTIONS[massage_type]["text"]
-        photo = MASSAGE_DESCRIPTIONS[massage_type]["photo"]
-        await message.answer_photo(photo, caption=description)
-    else:
-        await message.answer("Будь ласка, виберіть масаж із кнопок.")
+# Обробник вибору масажу
+@router.message(lambda message: message.text in MASSAGE_DESCRIPTIONS)
+async def show_massage_details(message: types.Message):
+    massage_name = message.text
+    massage = MASSAGE_DESCRIPTIONS[massage_name]
+    await message.answer(
+        massage["text"], 
+        reply_markup=main_keyboard(),
+        parse_mode="HTML",
+        disable_web_page_preview=True
+    )
+    await bot.send_photo(message.chat.id, massage["photo"])
 
 # Обробник кнопки "Прайс"
-@dp.message(lambda message: message.text.lower() == "прайс")
+@router.message(lambda message: message.text.lower() == "прайс")
 async def show_price(message: types.Message):
-    try:
-        await message.answer_photo(PRICE_IMAGE_URL, caption="Ось наш прайс 📋")
-    except Exception as e:
-        await message.answer("⚠ Виникла помилка при відправці прайсу.")
-        print(f"Помилка: {e}")
+    await message.answer("Прайс на масажі:", reply_markup=main_keyboard())
+    await bot.send_photo(message.chat.id, PRICE_IMAGE_URL)
 
-# Головна асинхронна функція
+# Запуск бота
 async def main():
-    dp.include_router(router)  # Додаємо router в Dispatcher
     await set_bot_commands()
+    dp.include_router(router)
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
