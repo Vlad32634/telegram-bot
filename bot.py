@@ -71,7 +71,7 @@ async def subscribers_handler(message: types.Message):
 
     subscriber_list = "\n".join([f"🆔 {user_id}" for user_id in subscribers])
     await message.answer(f"📋 Список підписників:\n{subscriber_list}")
-    
+
 # Опис масажів
 MASSAGE_DESCRIPTIONS = {
     "Класичний масаж": {
@@ -118,7 +118,7 @@ def main_keyboard():
         resize_keyboard=True
     )
     return keyboard
-    
+
 # Обробник команди /start
 @router.message(Command("start"))
 async def start_handler(message: types.Message):
@@ -126,7 +126,7 @@ async def start_handler(message: types.Message):
     if user_id not in subscribers:
         subscribers.add(user_id)
         await notify_admins(f"➕ Новий підписник: {message.from_user.full_name} (@{message.from_user.username}, ID: {user_id})")
-    
+
     await message.answer("Привіт! Я бот для запису на масаж.", reply_markup=main_keyboard())
 
 # Функція для надсилання повідомлення адміністраторам
@@ -136,7 +136,7 @@ async def notify_admins(text):
             await bot.send_message(admin_id.strip(), text)
         except Exception as e:
             print(f"❌ Не вдалося надіслати повідомлення адміну {admin_id}: {e}")
-    
+
 # Обробник кнопки "Записатися на масаж"
 @router.message(lambda message: message.text.lower() == "записатися на масаж")
 async def book_massage(message: types.Message):
@@ -158,7 +158,7 @@ async def show_massage_list(message: types.Message):
         resize_keyboard=True
     )
     await message.answer("Оберіть вид масажу:", reply_markup=keyboard)
-    
+
 # Обробник вибору масажу
 @router.message(lambda message: message.text in MASSAGE_DESCRIPTIONS)
 async def show_massage_details(message: types.Message):
@@ -170,13 +170,12 @@ async def show_massage_details(message: types.Message):
         parse_mode="HTML",
         disable_web_page_preview=True
     )
-    await bot.send_photo(message.chat.id, massage["photo"])
+    await message.answer_photo(massage["photo"])
 
 # Обробник кнопки "Прайс"
 @router.message(lambda message: message.text.lower() == "прайс")
 async def show_price(message: types.Message):
-    await message.answer("Прайс на масажі:", reply_markup=main_keyboard())
-    await bot.send_photo(message.chat.id, PRICE_IMAGE_URL)
+    await message.answer_photo(PRICE_IMAGE_URL, caption="📋 Ось наш актуальний прайс на масажі.")
 
 # Запуск бота
 async def main():
@@ -184,5 +183,6 @@ async def main():
     dp.include_router(router)
     await dp.start_polling(bot)
 
+# Стартуємо бота
 if __name__ == "__main__":
     asyncio.run(main())
