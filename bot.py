@@ -146,6 +146,7 @@ PRICE_IMAGE_URL = "https://www.dropbox.com/scl/fi/z25kakyigrnuoz5idl1hv/photo_20
 def main_keyboard():
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
+            [KeyboardButton(text="🔥 ЗНИЖКА НА МАСАЖ 20%!")],  # Верхня кнопка
             [KeyboardButton(text="Записатися на масаж")],
             [KeyboardButton(text="Опис масажів")],
             [KeyboardButton(text="Прайс")],
@@ -188,6 +189,20 @@ async def notify_admins(text):
         except Exception as e:
             print(f"❌ Не вдалося надіслати повідомлення адміну {admin_id}: {e}")
 
+# Обробник кнопки "ЗНИЖКА"
+@router.message(lambda message: message.text == "🔥 ЗНИЖКА НА МАСАЖ 20%!")
+async def discount_handler(message: types.Message):
+    user_id = message.from_user.id
+    username = message.from_user.username or "Немає юзернейму"
+    full_name = message.from_user.full_name
+
+    # Надсилаємо повідомлення користувачу
+    await message.answer("🎉 Вам надано знижку 20%! Скористайтесь нею до кінця цього тижня.")
+
+    # Сповіщення адміну
+    admin_message = f"🔔 {full_name} (@{username}, ID: {user_id}) натиснув(ла) на кнопку 'ЗНИЖКА НА МАСАЖ 20%'!"
+    await notify_admins(admin_message)
+    
 # Обробник кнопки "Записатися на масаж"
 @router.message(lambda message: message.text.lower() == "записатися на масаж")
 async def book_massage(message: types.Message):
