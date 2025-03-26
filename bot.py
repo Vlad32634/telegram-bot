@@ -209,6 +209,11 @@ async def show_massage_list(message: types.Message):
     )
     await message.answer("Оберіть вид масажу:", reply_markup=keyboard)
 
+# Обробник кнопки "🔙 Назад"
+@router.message(lambda message: message.text and message.text.lower() == "🔙 назад")
+async def back_to_main(message: types.Message):
+    await message.answer("🔙 Повертаємося в головне меню.", reply_markup=main_keyboard())
+    
 # Обробник вибору масажу
 @router.message(lambda message: message.text in MASSAGE_DESCRIPTIONS)
 async def show_massage_details(message: types.Message):
