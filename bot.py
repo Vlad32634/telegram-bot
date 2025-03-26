@@ -147,7 +147,8 @@ def main_keyboard():
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="Записатися на масаж")],
-            [KeyboardButton(text="Опис масажів"), KeyboardButton(text="Прайс")],
+            [KeyboardButton(text="Опис масажів")],
+            [KeyboardButton(text="Прайс")],
             [KeyboardButton(text="Перевірити статус")]
         ],
         resize_keyboard=True
