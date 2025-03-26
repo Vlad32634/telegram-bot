@@ -158,6 +158,9 @@ def main_keyboard():
 @router.message(Command("start"))
 async def start_handler(message: types.Message):
     user_id = str(message.from_user.id)
+    username = f"@{message.from_user.username}" if message.from_user.username else "Без юзернейму"
+    full_name = message.from_user.full_name
+    
     if user_id not in subscribers:
         subscribers.add(user_id)
         await notify_admins(f"➕ Новий підписник: {message.from_user.full_name} (@{message.from_user.username}, ID: {user_id})")
@@ -165,8 +168,9 @@ async def start_handler(message: types.Message):
     welcome_text = (
         "Привіт! Мене звати Влад, я масажист і реабілітолог 👨‍⚕️ з досвідом понад 5 років.\n"
         "В моєму телеграм-боті ви можете:\n"
-        "✔ Записатися на масаж\n"
-        "✔ Дізнатися про види масажу\n"
+        "✔ Отримати ЗНИЖКУ на масаж, просто натиснувши клавішу\n"
+        "✔ Дізнатися все про види масажу і обрати який Вам підходить\n"
+        "✔ Записатись на масаж\n"
         "✔ Переглянути прайс\n\n"
         "Обирайте потрібний розділ нижче 👇"
     )
@@ -195,7 +199,7 @@ async def check_status(message: types.Message):
     await message.answer("ℹ Ваш статус: Очікує підтвердження.")
 
 # Обробник кнопки "Опис масажів"
-@dp.message(lambda message: message.text.lower() == "опис масажів")
+@router.message(lambda message: message.text and message.text.lower() == "опис масажів")
 async def show_massage_list(message: types.Message):
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
