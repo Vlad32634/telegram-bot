@@ -151,6 +151,7 @@ def main_keyboard():
             [KeyboardButton(text="Опис масажів")],
             [KeyboardButton(text="Прайс")],
             [KeyboardButton(text="Перевірити статус")]
+            [KeyboardButton(text="📍 Локація")]  # Додаємо кнопку Локації
         ],
         resize_keyboard=True
     )
@@ -247,6 +248,13 @@ async def show_massage_details(message: types.Message):
 @router.message(lambda message: message.text.lower() == "прайс")
 async def show_price(message: types.Message):
     await message.answer_photo(PRICE_IMAGE_URL, caption="📋 Ось наш актуальний прайс на масажі.")
+
+@router.message(lambda message: message.text == "📍 Локація")
+async def location_handler(message: types.Message):
+    google_maps_url = "https://maps.app.goo.gl/8sjemYu7jFZAseip9"  # Замініть на своє посилання
+    address_text = "📍 Адреса: вул. Віталія Нестеренка 1в, 6 будинок, 2 парадна, Одеські Традиції"
+
+    await message.answer(f"{address_text}\n\n🌍 Google Maps: {google_maps_url}")
 
 # Запуск бота
 async def main():
