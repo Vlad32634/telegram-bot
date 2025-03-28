@@ -146,7 +146,7 @@ PRICE_IMAGE_URL = "https://www.dropbox.com/scl/fi/z25kakyigrnuoz5idl1hv/photo_20
 def main_keyboard():
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text="📞 Зв'язатися зі мною", url="495607752")],
+            [KeyboardButton(text="📞 Зв'язатися зі мною", url="https://t.me/trenersokalsky")]
             [KeyboardButton(text="🔥 ЗНИЖКА НА МАСАЖ 20%!")],  # Верхня кнопка
             [KeyboardButton(text="Записатися на масаж")],
             [KeyboardButton(text="Опис масажів")],
