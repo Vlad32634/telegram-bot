@@ -150,7 +150,7 @@ def main_keyboard():
             [KeyboardButton(text="Записатися на масаж")],
             [KeyboardButton(text="Опис масажів")],
             [KeyboardButton(text="Прайс")],
-            [KeyboardButton(text="Перевірити статус")]
+            [KeyboardButton(text="Перевірити статус")],
             [KeyboardButton(text="📍 Локація")]  # Додаємо кнопку Локації
         ],
         resize_keyboard=True
