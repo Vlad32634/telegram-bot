@@ -166,6 +166,13 @@ def contact_keyboard():
         ]
     )
     return keyboard
+
+# Кнопка для надсилання контакту
+def contact_button():
+    return ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text="📞 Поділитися контактом", request_contact=True)]],
+        resize_keyboard=True
+    )
     
 # Обробник команди /start
 @router.message(Command("start"))
