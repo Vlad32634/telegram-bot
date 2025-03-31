@@ -269,7 +269,7 @@ async def location_handler(message: types.Message):
     await message.answer(f"{address_text}\n\n🌍 Google Maps: {google_maps_url}")
 
 # Обробник кнопки "Зв'язатися зі мною"
-@router.message(F.text == "📞 Зв'язатися зі мною")
+@router.message(lambda message: message.text == "📞 Зв'язатися зі мною")
 async def contact_handler(message: types.Message):
     await message.answer("📞 Якщо у вас є питання, зв’яжіться зі мною:", reply_markup=contact_keyboard())
     
