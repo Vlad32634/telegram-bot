@@ -152,18 +152,20 @@ def main_keyboard():
             [KeyboardButton(text="Прайс")],
             [KeyboardButton(text="Перевірити статус")],
             [KeyboardButton(text="📍 Локація")]  # Додаємо кнопку Локації
+            [KeyboardButton(text="📞 Зв'язатися зі мною")]  # Додаємо кнопку в головне меню
         ],
         resize_keyboard=True
     )
     return keyboard
 
-def contact_button():
-    inline_kb = InlineKeyboardMarkup(
+# Inline-кнопка для контакту
+def contact_keyboard():
+    keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="📞 Зв'язатися зі мною", url="https://t.me/trenersokalsky")]
+            [InlineKeyboardButton(text="📞 Написати мені в Telegram", url="https://t.me/trenersokalsky")]
         ]
     )
-    return inline_kb
+    return keyboard
     
 # Обробник команди /start
 @router.message(Command("start"))
@@ -265,6 +267,11 @@ async def location_handler(message: types.Message):
     address_text = "📍 Адреса: вул. Віталія Нестеренка 1Б, 6 будинок, 2 парадна, Одеські Традиції"
 
     await message.answer(f"{address_text}\n\n🌍 Google Maps: {google_maps_url}")
+
+# Обробник кнопки "Зв'язатися зі мною"
+@router.message(F.text == "📞 Зв'язатися зі мною")
+async def contact_handler(message: types.Message):
+    await message.answer("📞 Якщо у вас є питання, зв’яжіться зі мною:", reply_markup=contact_keyboard())
     
 # Запуск бота
 async def main():
