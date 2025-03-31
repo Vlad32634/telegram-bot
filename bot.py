@@ -157,14 +157,6 @@ def main_keyboard():
         resize_keyboard=True
     )
     return keyboard
-
-def contact_button():
-    return ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="📞 Поділитися контактом", request_contact=True)]
-        ],
-        resize_keyboard=True
-    )
     
 # Inline-кнопка для контакту
 def contact_keyboard():
