@@ -166,13 +166,6 @@ def contact_keyboard():
         ]
     )
     return keyboard
-
-# Кнопка для надсилання контакту
-def contact_button():
-    return ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text="📞 Поділитися контактом", request_contact=True)]],
-        resize_keyboard=True
-    )
     
 # Обробник команди /start
 @router.message(Command("start"))
@@ -198,7 +191,6 @@ async def start_handler(message: types.Message):
     WELCOME_PHOTO_URL = "https://www.dropbox.com/scl/fi/cdcdcurqd5drqazmb1qem/.jpg?rlkey=qelj9sfhpalt7xdynzbwoajxo&st=7cyakdtf&dl=0"
 
     await bot.send_photo(message.chat.id, WELCOME_PHOTO_URL, caption=welcome_text, reply_markup=main_keyboard())
-    await message.answer("📞 Для зв’язку зі мною натисніть кнопку нижче:", reply_markup=contact_button())
     
 # Функція для надсилання повідомлення адміністраторам
 async def notify_admins(text):
