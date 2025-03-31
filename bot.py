@@ -1,5 +1,5 @@
 from aiogram import Bot, Dispatcher, Router, types
-from aiogram.types import BotCommand, ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import BotCommand, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.filters import Command
 import asyncio
 import os
@@ -146,7 +146,6 @@ PRICE_IMAGE_URL = "https://www.dropbox.com/scl/fi/z25kakyigrnuoz5idl1hv/photo_20
 def main_keyboard():
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text="📞 Зв'язатися зі мною", url="https://t.me/trenersokalsky")],
             [KeyboardButton(text="🔥 ЗНИЖКА НА МАСАЖ 20%!")],  # Верхня кнопка
             [KeyboardButton(text="Записатися на масаж")],
             [KeyboardButton(text="Опис масажів")],
@@ -158,6 +157,14 @@ def main_keyboard():
     )
     return keyboard
 
+def contact_button():
+    inline_kb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="📞 Зв'язатися зі мною", url="https://t.me/trenersokalsky")]
+        ]
+    )
+    return inline_kb
+    
 # Обробник команди /start
 @router.message(Command("start"))
 async def start_handler(message: types.Message):
@@ -182,6 +189,7 @@ async def start_handler(message: types.Message):
     WELCOME_PHOTO_URL = "https://www.dropbox.com/scl/fi/cdcdcurqd5drqazmb1qem/.jpg?rlkey=qelj9sfhpalt7xdynzbwoajxo&st=7cyakdtf&dl=0"
 
     await bot.send_photo(message.chat.id, WELCOME_PHOTO_URL, caption=welcome_text, reply_markup=main_keyboard())
+    await message.answer("📞 Для зв’язку зі мною натисніть кнопку нижче:", reply_markup=contact_button())
     
 # Функція для надсилання повідомлення адміністраторам
 async def notify_admins(text):
