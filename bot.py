@@ -142,6 +142,14 @@ MASSAGE_DESCRIPTIONS = {
 # Посилання на зображення прайсу
 PRICE_IMAGE_URL = "https://www.dropbox.com/scl/fi/z25kakyigrnuoz5idl1hv/photo_2025-03-20_16-16-36.jpg?rlkey=tszprs745na564o1m9ku5jz26&st=td8us3zu&dl=0"
 
+def contact_button():
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="📞 Поділитися контактом", request_contact=True)]
+        ],
+        resize_keyboard=True
+    )
+    
 # Функція для створення головної клавіатури
 def main_keyboard():
     keyboard = ReplyKeyboardMarkup(
