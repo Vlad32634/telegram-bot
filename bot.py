@@ -191,7 +191,7 @@ async def start_handler(message: types.Message):
     WELCOME_PHOTO_URL = "https://www.dropbox.com/scl/fi/cdcdcurqd5drqazmb1qem/.jpg?rlkey=qelj9sfhpalt7xdynzbwoajxo&st=7cyakdtf&dl=0"
 
     await bot.send_photo(message.chat.id, WELCOME_PHOTO_URL, caption=welcome_text, reply_markup=main_keyboard())
-    await message.answer("📞 Якщо маєш питання або хочеш записатися, напиши мені в Telegram: [Зв’язатись](https://t.me/trenersokalsky), parse_mode="Markdown")
+    await message.answer("📞 Якщо маєш питання або хочеш записатися, напиши мені в Telegram: [Зв’язатись](https://t.me/trenersokalsky)", parse_mode="Markdown")
     
 # Функція для надсилання повідомлення адміністраторам
 async def notify_admins(text):
