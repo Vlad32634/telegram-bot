@@ -51,6 +51,19 @@ async def load_subscribers_from_db():
         rows = await conn.fetch("SELECT id FROM subscribers")
     await pool.close()
     return set(int(row["id"]) for row in rows)
+
+async def create_tables():
+    pool = await create_pool()
+    async with pool.acquire() as conn:
+        await conn.execute("""
+            CREATE TABLE IF NOT EXISTS subscribers (
+                id BIGINT PRIMARY KEY,
+                username TEXT,
+                full_name TEXT,
+                phone_number TEXT
+            );
+        """)
+    await pool.close()
     
 # Список підписників
 subscribers = set()
@@ -80,6 +93,8 @@ async def set_bot_commands():
     await bot.set_my_commands(commands)
 
 async def main():
+    await create_tables()
+    
     # Крок 1: імпортуємо підписників у базу
     await import_subscribers_to_db()
 
@@ -124,19 +139,32 @@ async def broadcast_handler(message: types.Message):
 
     await message.answer(f"✅ Повідомлення надіслано {sent_count} користувачам.")
 
-# Обробник команди /subscribers (список підписників)
 @router.message(Command("subscribers"))
 async def subscribers_handler(message: types.Message):
     if not is_admin(message.from_user.id):
         await message.answer("❌ У вас немає прав для перегляду підписників.")
         return
 
-    if not subscribers:
+    pool = await create_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch("SELECT id, username, full_name, phone_number FROM subscribers")
+
+    if not rows:
         await message.answer("📋 Підписників ще немає.")
         return
 
-    subscriber_list = "\n".join([f"🆔 {user_id}" for user_id in subscribers])
-    await message.answer(f"📋 Список підписників:\n{subscriber_list}")
+    lines = []
+    for row in rows:
+        line = f"🆔 {row['id']}"
+        if row['username']:
+            line += f" | @{row['username']}"
+        if row['full_name']:
+            line += f" | {row['full_name']}"
+        if row['phone_number']:
+            line += f" | 📞 {row['phone_number']}"
+        lines.append(line)
+
+    await message.answer("📋 Список підписників:\n\n" + "\n".join(lines))
 
 # Опис масажів
 MASSAGE_DESCRIPTIONS = {
@@ -205,18 +233,26 @@ async def start_handler(message: types.Message):
     username = f"@{message.from_user.username}" if message.from_user.username else "Без юзернейму"
     full_name = message.from_user.full_name
     
-    if user_id not in subscribers:
-        subscribers.add(user_id)
-         
+   if user_id not in subscribers:
+    subscribers.add(user_id)
+
     pool = await create_pool()
     async with pool.acquire() as conn:
         await conn.execute(
-            "INSERT INTO subscribers(id) VALUES($1) ON CONFLICT DO NOTHING",
-            int(user_id)
+            """
+            INSERT INTO subscribers(id, username, full_name)
+            VALUES($1, $2, $3)
+            ON CONFLICT (id) DO UPDATE
+            SET username = EXCLUDED.username,
+                full_name = EXCLUDED.full_name
+            """,
+            int(user_id),
+            message.from_user.username,
+            message.from_user.full_name
         )
     await pool.close()
-    
-    await notify_admins(f"➕ Новий підписник: {message.from_user.full_name} (@{message.from_user.username}, ID: {user_id})")
+
+    await notify_admins(f"➕ Новий підписник: {full_name} ({username}, ID: {user_id})")
 
     welcome_text = (
         "Привіт! Мене звати Влад, я масажист і реабілітолог 👨‍⚕️ з досвідом понад 5 років.\n"
@@ -257,9 +293,19 @@ async def discount_handler(message: types.Message):
     
 # Обробник кнопки "Записатися на масаж"
 @router.message(lambda message: message.text.lower() == "записатися на масаж")
-async def book_massage(message: types.Message):
-    await message.answer("✅ Ви записалися на масаж. З вами зв'яжеться масажист.")
-    await notify_admins(f"📅 Новий запис на масаж: {message.from_user.full_name} (@{message.from_user.username}, ID: {message.from_user.id})")
+async def ask_for_contact(message: types.Message):
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="📞 Надіслати номер телефону", request_contact=True)],
+            [KeyboardButton(text="🔙 Назад")]
+        ],
+        resize_keyboard=True,
+        one_time_keyboard=True
+    )
+    await message.answer(
+        "Щоб записатись на масаж, будь ласка, надішліть свій номер телефону 👇",
+        reply_markup=keyboard
+    )
 
 # Обробник кнопки "Перевірити статус"
 @dp.message(lambda message: message.text.lower() == "перевірити статус")
@@ -312,7 +358,36 @@ async def location_handler(message: types.Message):
 @router.message(lambda message: message.text == "📞 Зв'язатися зі мною")
 async def contact_handler(message: types.Message):
     await message.answer("📞 Якщо у вас є питання, зв’яжіться зі мною:", reply_markup=contact_keyboard())
+
+@router.message(lambda message: message.contact is not None)
+async def contact_handler(message: types.Message):
+    user_id = message.from_user.id
+    phone = message.contact.phone_number
+    username = message.from_user.username
+    full_name = message.from_user.full_name
+
+    pool = await create_pool()
+    async with pool.acquire() as conn:
+        await conn.execute(
+            """
+            INSERT INTO subscribers(id, username, full_name, phone_number)
+            VALUES($1, $2, $3, $4)
+            ON CONFLICT (id) DO UPDATE
+            SET username = EXCLUDED.username,
+                full_name = EXCLUDED.full_name,
+                phone_number = EXCLUDED.phone_number
+            """,
+            user_id,
+            username,
+            full_name,
+            phone
+        )
+    await pool.close()
+
+    await message.answer("✅ Ви записалися на масаж! З вами зв'яжеться масажист.")
+    await notify_admins(f"📅 Запис на масаж: {full_name} (@{username}) | 📞 {phone}")
     
 # Стартуємо бота
 if __name__ == "__main__":
     asyncio.run(main())
+    
