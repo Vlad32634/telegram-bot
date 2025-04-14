@@ -3,20 +3,55 @@ from aiogram.types import BotCommand, ReplyKeyboardMarkup, KeyboardButton, Inlin
 from aiogram.filters import Command
 import asyncio
 import os
+import asyncpg
 
 TOKEN = os.getenv("BOT_TOKEN", "")
 ADMIN_IDS = os.getenv("ADMIN_IDS", "")
-WELCOME_PHOTO_URL = "https://www.dropbox.com/scl/fi/cdcdcurqd5drqazmb1qem/.jpg?rlkey=qelj9sfhpalt7xdynzbwoajxo&st=7cyakdtf&dl=0"  
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+WELCOME_PHOTO_URL = "https://www.dropbox.com/scl/fi/cdcdcurqd5drqazmb1qem/.jpg?rlkey=qelj9sfhpalt7xdynzbwoajxo&st=7cyakdtf&dl=0" 
+
 if not TOKEN:
     raise ValueError("Токен бота не знайдено! Перевірте налаштування змінної середовища.")
 if not ADMIN_IDS:
     raise ValueError("ADMIN_IDS не встановлено в змінних середовища.")
-
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL не встановлено в змінних середовища.")
+    
 # Ініціалізація бота та диспетчера
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 router = Router()
 
+# Функція для підключення до бази даних
+async def create_pool():
+    return await asyncpg.create_pool(dsn=DATABASE_URL)
+
+async def import_subscribers_to_db():
+    pool = await create_pool()
+
+    old_subscribers = [
+        564525311, 475507771, 1984425778, 327439364, 349725465, 462146954,
+        7704148825, 495607752, 1941929116, 636190863, 734548109, 314922833,
+        553607432, 185019439, 271724486, 678517952, 615384120, 1042247200,
+        532765998, 360411784, 540520206, 915746138
+    ]
+
+    async with pool.acquire() as conn:
+        for user_id in old_subscribers:
+            existing_subscriber = await conn.fetchval("SELECT id FROM subscribers WHERE id = $1", user_id)
+            if not existing_subscriber:
+                await conn.execute("INSERT INTO subscribers(id) VALUES($1)", user_id)
+
+    await pool.close()
+
+async def load_subscribers_from_db():
+    pool = await create_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch("SELECT id FROM subscribers")
+    await pool.close()
+    return set(int(row["id"]) for row in rows)
+    
 # Список підписників
 subscribers = set()
 
@@ -34,24 +69,6 @@ def is_admin(user_id):
     admin_ids = ADMIN_IDS.split(",") if ADMIN_IDS else []
     admin_ids = [admin_id.strip() for admin_id in admin_ids if admin_id.strip().isdigit()]
     return str(user_id) in admin_ids
-
-# Функція для надсилання повідомлення адміністраторам
-async def notify_admins(text):
-    if not ADMIN_IDS:
-        print("❌ Немає ID адміністратора у змінній середовища ADMIN_IDS.")
-        return
-
-    admin_ids = ADMIN_IDS.split(",")
-    for admin_id in admin_ids:
-        admin_id = admin_id.strip()
-        if not admin_id.isdigit():
-            print(f"❌ Невірний ID адміністратора: {admin_id}")
-            continue
-
-        try:
-            await bot.send_message(admin_id, text)
-        except Exception as e:
-            print(f"❌ Не вдалося надіслати повідомлення адміну {admin_id}: {e}")
             
 # Функція для налаштування команд
 async def set_bot_commands():
@@ -62,11 +79,25 @@ async def set_bot_commands():
     ]
     await bot.set_my_commands(commands)
 
-async def notify_admin(text):
-    try:
-        await bot.send_message(ADMIN_IDS, text)
-    except Exception as e:
-        print(f"Не вдалося надіслати повідомлення адміну: {e}")
+async def main():
+    # Крок 1: імпортуємо підписників у базу
+    await import_subscribers_to_db()
+
+    # Крок 2: оновлюємо глобальний список із бази
+    global subscribers
+    subscribers.update(await load_subscribers_from_db())
+
+    # Крок 3: налаштовуємо команди
+    await set_bot_commands()
+
+    # Крок 4: додаємо роутер
+    dp.include_router(router)
+
+    # Крок 5: повідомляємо адміністраторів
+    await notify_admins("✅ Бот запущено!")
+
+    # Крок 6: стартуємо бота
+    await dp.start_polling(bot)
 
 # Обробник команди /broadcast (розсилка)
 @router.message(Command("broadcast"))
@@ -176,6 +207,15 @@ async def start_handler(message: types.Message):
     
     if user_id not in subscribers:
         subscribers.add(user_id)
+         
+        pool = await create_pool()
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "INSERT INTO subscribers(id) VALUES($1) ON CONFLICT DO NOTHING",
+            int(user_id)
+        )
+    await pool.close()
+    
         await notify_admins(f"➕ Новий підписник: {message.from_user.full_name} (@{message.from_user.username}, ID: {user_id})")
 
     welcome_text = (
@@ -273,13 +313,6 @@ async def location_handler(message: types.Message):
 async def contact_handler(message: types.Message):
     await message.answer("📞 Якщо у вас є питання, зв’яжіться зі мною:", reply_markup=contact_keyboard())
     
-# Запуск бота
-async def main():
-    await set_bot_commands()
-    dp.include_router(router)
-    await notify_admin("✅ Бот запущено!")
-    await dp.start_polling(bot)
-
 # Стартуємо бота
 if __name__ == "__main__":
     asyncio.run(main())
