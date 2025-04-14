@@ -208,7 +208,7 @@ async def start_handler(message: types.Message):
     if user_id not in subscribers:
         subscribers.add(user_id)
          
-        pool = await create_pool()
+    pool = await create_pool()
     async with pool.acquire() as conn:
         await conn.execute(
             "INSERT INTO subscribers(id) VALUES($1) ON CONFLICT DO NOTHING",
@@ -216,7 +216,7 @@ async def start_handler(message: types.Message):
         )
     await pool.close()
     
-        await notify_admins(f"➕ Новий підписник: {message.from_user.full_name} (@{message.from_user.username}, ID: {user_id})")
+    await notify_admins(f"➕ Новий підписник: {message.from_user.full_name} (@{message.from_user.username}, ID: {user_id})")
 
     welcome_text = (
         "Привіт! Мене звати Влад, я масажист і реабілітолог 👨‍⚕️ з досвідом понад 5 років.\n"
