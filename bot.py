@@ -234,7 +234,7 @@ async def start_handler(message: types.Message):
     full_name = message.from_user.full_name
     
     if user_id not in subscribers:
-    subscribers.add(user_id)
+        subscribers.add(user_id)
 
     pool = await create_pool()
     async with pool.acquire() as conn:
