@@ -233,7 +233,7 @@ async def start_handler(message: types.Message):
     username = f"@{message.from_user.username}" if message.from_user.username else "Без юзернейму"
     full_name = message.from_user.full_name
     
-   if user_id not in subscribers:
+    if user_id not in subscribers:
     subscribers.add(user_id)
 
     pool = await create_pool()
