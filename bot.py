@@ -349,8 +349,8 @@ async def show_price(message: types.Message):
 # Обробник кнопки "📍 Локація"
 @router.message(lambda message: message.text == "📍 Локація")
 async def location_handler(message: types.Message):
-    google_maps_url = "https://maps.app.goo.gl/8sjemYu7jFZAseip9"  # Замініть на своє посилання
-    address_text = "📍 Адреса: вул. Віталія Нестеренка 1Б, 6 будинок, 2 парадна, Одеські Традиції"
+    google_maps_url = "https://maps.app.goo.gl/Z87zYbuceo9ijMwA8"  # Замініть на своє посилання
+    address_text = "📍 Адреса: вул. Віталія Нестеренка 1Б, 1 будинок, салон "Happy Family", Одеські Традиції"
 
     await message.answer(f"{address_text}\n\n🌍 Google Maps: {google_maps_url}")
 
