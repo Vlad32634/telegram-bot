@@ -308,10 +308,10 @@ async def ask_for_contact(message: types.Message):
     )
 
 # Обробник кнопки "Перевірити статус"
-@dp.message(lambda message: message.text.lower() == "перевірити статус")
+@dp.message(lambda message: message.text and message.text.lower() == "перевірити статус")
 async def check_status(message: types.Message):
     await message.answer("ℹ Ваш статус: Очікує підтвердження.")
-
+    
 # Обробник кнопки "Опис масажів"
 @router.message(lambda message: message.text and message.text.lower() == "опис масажів")
 async def show_massage_list(message: types.Message):
