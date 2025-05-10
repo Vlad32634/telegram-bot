@@ -26,18 +26,7 @@ router = Router()
 # Функція для підключення до бази даних
 async def create_pool():
     return await asyncpg.create_pool(dsn=DATABASE_URL)
-
-async def import_subscribers_to_db():
-    pool = await create_pool()
     
-    async with pool.acquire() as conn:
-        for user_id in old_subscribers:
-            existing_subscriber = await conn.fetchval("SELECT id FROM subscribers WHERE id = $1", user_id)
-            if not existing_subscriber:
-                await conn.execute("INSERT INTO subscribers(id) VALUES($1)", user_id)
-
-    await pool.close()
-
 async def load_subscribers_from_db():
     pool = await create_pool()
     async with pool.acquire() as conn:
@@ -88,9 +77,6 @@ async def set_bot_commands():
 async def main():
     await create_tables()
     
-    # Крок 1: імпортуємо підписників у базу
-    await import_subscribers_to_db()
-
     # Крок 2: оновлюємо глобальний список із бази
     global subscribers
     subscribers.update(await load_subscribers_from_db())
