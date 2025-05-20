@@ -50,9 +50,6 @@ async def create_tables():
 # Список підписників
 subscribers = set()
 
-# Отримуємо список ID адміністратора із змінної середовища
-ADMIN_IDS = os.getenv("ADMIN_IDS")
-
 # Перевіряємо, чи є ADMIN_IDS у змінних середовища
 if not ADMIN_IDS:
     print("❌ Не знайдено ADMIN_IDS у змінних середовища.")
@@ -324,7 +321,7 @@ async def show_massage_details(message: types.Message):
     await message.answer_photo(massage["photo"])
 
 # Обробник кнопки "Прайс"
-@router.message(lambda message: message.text.lower() == "прайс")
+@router.message(lambda message: message.text and message.text.lower() == "прайс")
 async def show_price(message: types.Message):
     await message.answer_photo(PRICE_IMAGE_URL, caption="📋 Ось наш актуальний прайс на масажі.")
 
