@@ -274,8 +274,7 @@ async def discount_handler(message: types.Message):
     admin_message = f"🔔 {full_name} (@{username}, ID: {user_id}) натиснув(ла) на кнопку 'ЗНИЖКА НА МАСАЖ 20%'!"
     await notify_admins(admin_message)
     
-# Обробник кнопки "Записатися на масаж"
-@router.message(lambda message: message.text.lower() == "записатися на масаж")
+@router.message(lambda message: message.text and message.text.lower() == "записатися на масаж")
 async def ask_for_contact(message: types.Message):
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
@@ -343,12 +342,13 @@ async def contact_handler(message: types.Message):
     await message.answer("📞 Якщо у вас є питання, зв’яжіться зі мною:", reply_markup=contact_keyboard())
 
 @router.message(lambda message: message.contact is not None)
-async def contact_handler(message: types.Message):
+async def process_contact(message: types.Message):
     user_id = message.from_user.id
     phone = message.contact.phone_number
-    username = message.from_user.username
+    username = message.from_user.username or "Немає юзернейму"
     full_name = message.from_user.full_name
 
+    # Збереження в базу
     pool = await create_pool()
     async with pool.acquire() as conn:
         await conn.execute(
@@ -367,7 +367,10 @@ async def contact_handler(message: types.Message):
         )
     await pool.close()
 
+    # Відповідь користувачу
     await message.answer("✅ Ви записалися на масаж! З вами зв'яжеться масажист.")
+
+    # Сповіщення адміну
     await notify_admins(f"📅 Запис на масаж: {full_name} (@{username}) | 📞 {phone}")
     
 # Стартуємо бота
