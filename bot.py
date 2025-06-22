@@ -211,7 +211,6 @@ async def start_handler(message: types.Message):
         "Щоб користуватись ботом, підтвердіть, що ви не бот 👇",
         reply_markup=markup
     )
-    
    @router.callback_query(lambda c: c.data.startswith("verify:"))
 async def process_verify(callback: types.CallbackQuery):
     user = callback.from_user
