@@ -211,7 +211,7 @@ async def start_handler(message: types.Message):
         "Щоб користуватись ботом, підтвердіть, що ви не бот 👇",
         reply_markup=markup
     )
-   
+
 @router.callback_query(lambda c: c.data.startswith("verify:"))
 async def process_verify(callback: types.CallbackQuery):
     user = callback.from_user
@@ -219,7 +219,7 @@ async def process_verify(callback: types.CallbackQuery):
     username = user.username
     full_name = user.full_name
 
-    # 🛑 Анти-бот фільтр: без username і full_name — блокуємо
+    # Анти-бот фільтр: без username і full_name — блокуємо
     if not username and not full_name:
         await callback.message.edit_text("🚫 Ви виглядаєте як бот. Доступ заборонено.")
         return
@@ -257,11 +257,6 @@ async def process_verify(callback: types.CallbackQuery):
     await callback.message.delete()
     await bot.send_photo(user.id, WELCOME_PHOTO_URL, caption=welcome_text, reply_markup=main_keyboard())
     await bot.send_message(user.id, "📞 Напиши мені в Telegram: [Зв’язатись](https://t.me/trenersokalsky)", parse_mode="Markdown")
-
-    WELCOME_PHOTO_URL = "https://www.dropbox.com/scl/fi/cdcdcurqd5drqazmb1qem/.jpg?rlkey=qelj9sfhpalt7xdynzbwoajxo&st=7cyakdtf&dl=0"
-
-    await bot.send_photo(message.chat.id, WELCOME_PHOTO_URL, caption=welcome_text, reply_markup=main_keyboard())
-    await message.answer("📞 Якщо маєш питання або хочеш записатися, напиши мені в Telegram: [Зв’язатись](https://t.me/trenersokalsky)", parse_mode="Markdown")
     
 # Функція для надсилання повідомлення адміністраторам
 async def notify_admins(text):
