@@ -206,7 +206,7 @@ def contact_keyboard():
 async def start_handler(message: types.Message):
     markup = InlineKeyboardMarkup(
     inline_keyboard=[
-        [InlineKeyboardButton("✅ Я не бот", callback_data=f"verify:{message.from_user.id}")]
+        [InlineKeyboardButton(text="✅ Я не бот", callback_data=f"verify:{message.from_user.id}")]
     ]
 )
     await message.answer(
