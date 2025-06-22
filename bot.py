@@ -204,9 +204,11 @@ def contact_keyboard():
 # Обробник команди /start
 @router.message(Command("start"))
 async def start_handler(message: types.Message):
-    markup = InlineKeyboardMarkup().add(
-        InlineKeyboardButton("✅ Я не бот", callback_data=f"verify:{message.from_user.id}")
-    )
+    markup = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [InlineKeyboardButton("✅ Я не бот", callback_data=f"verify:{message.from_user.id}")]
+    ]
+)
     await message.answer(
         "Щоб користуватись ботом, підтвердіть, що ви не бот 👇",
         reply_markup=markup
