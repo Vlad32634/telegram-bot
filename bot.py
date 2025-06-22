@@ -204,12 +204,25 @@ def contact_keyboard():
 # Обробник команди /start
 @router.message(Command("start"))
 async def start_handler(message: types.Message):
-    user_id = str(message.from_user.id)
-    username = f"@{message.from_user.username}" if message.from_user.username else "Без юзернейму"
-    full_name = message.from_user.full_name
+    markup = InlineKeyboardMarkup().add(
+        InlineKeyboardButton("✅ Я не бот", callback_data=f"verify:{message.from_user.id}")
+    )
+    await message.answer(
+        "Щоб користуватись ботом, підтвердіть, що ви не бот 👇",
+        reply_markup=markup
+    )
     
-    if user_id not in subscribers:
-        subscribers.add(user_id)
+   @router.callback_query(lambda c: c.data.startswith("verify:"))
+async def process_verify(callback: types.CallbackQuery):
+    user = callback.from_user
+    user_id = user.id
+    username = user.username
+    full_name = user.full_name
+
+    # 🛑 Анти-бот фільтр: без username і full_name — блокуємо
+    if not username and not full_name:
+        await callback.message.edit_text("🚫 Ви виглядаєте як бот. Доступ заборонено.")
+        return
 
     pool = await create_pool()
     async with pool.acquire() as conn:
@@ -221,23 +234,29 @@ async def start_handler(message: types.Message):
             SET username = EXCLUDED.username,
                 full_name = EXCLUDED.full_name
             """,
-            int(user_id),
-            message.from_user.username,
-            message.from_user.full_name
+            user_id,
+            username,
+            full_name
         )
     await pool.close()
 
-    await notify_admins(f"➕ Новий підписник: {full_name} ({username}, ID: {user_id})")
+    subscribers.add(str(user_id))
+
+    await notify_admins(f"➕ Новий підписник: {full_name} (@{username}, ID: {user_id})")
 
     welcome_text = (
         "Привіт! Мене звати Влад, я масажист і реабілітолог 👨‍⚕️ з досвідом понад 5 років.\n"
         "В моєму телеграм-боті ви можете:\n"
-        "✔ Отримати ЗНИЖКУ на масаж, просто натиснувши клавішу\n"
-        "✔ Дізнатися все про види масажу і обрати який Вам підходить\n"
-        "✔ Записатись на масаж\n"
+        "✔ Отримати ЗНИЖКУ на масаж\n"
+        "✔ Дізнатися все про види масажу\n"
+        "✔ Записатись\n"
         "✔ Переглянути прайс\n\n"
-        "Обирайте потрібний розділ нижче 👇"
+        "Обирай потрібне нижче 👇"
     )
+
+    await callback.message.delete()
+    await bot.send_photo(user.id, WELCOME_PHOTO_URL, caption=welcome_text, reply_markup=main_keyboard())
+    await bot.send_message(user.id, "📞 Напиши мені в Telegram: [Зв’язатись](https://t.me/trenersokalsky)", parse_mode="Markdown")
 
     WELCOME_PHOTO_URL = "https://www.dropbox.com/scl/fi/cdcdcurqd5drqazmb1qem/.jpg?rlkey=qelj9sfhpalt7xdynzbwoajxo&st=7cyakdtf&dl=0"
 
